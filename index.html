@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Presensi & Teaching-Learning Journal - BP3MI Aceh</title>
+    
+    <!-- Open Graph / Social Media Thumbnail Meta Tags -->
+    <meta property="og:title" content="Sistem Presensi & Teaching-Learning Journal - BP3MI Aceh">
+    <meta property="og:description" content="Sistem Terintegrasi Peningkatan Kapasitas Calon Pekerja Migran Program SMK Go Global - BP3MI Aceh">
+    <meta property="og:image" content="https://raw.githubusercontent.com/gyoutrain-lab/SkillUp_Eng_Tenses/main/bp3mi_fakinah.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sistem Presensi & Teaching-Learning Journal - BP3MI Aceh">
+    <meta name="twitter:description" content="Sistem Terintegrasi Peningkatan Kapasitas Calon Pekerja Migran Program SMK Go Global - BP3MI Aceh">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/gyoutrain-lab/SkillUp_Eng_Tenses/main/bp3mi_fakinah.jpg">
+
     <style>
         :root {
             --primary-color: #1e3a8a;
@@ -115,7 +126,6 @@
             font-size: 0.88rem;
         }
 
-        /* Feeder Teaching Journal Box */
         .journal-feeder-box {
             background: #f0fdf4;
             border: 2px dashed #10b981;
@@ -160,6 +170,28 @@
         .journal-group textarea {
             resize: vertical;
             height: 55px;
+        }
+
+        .operator-lock-banner {
+            background: #fffbeb;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-unlock {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.82rem;
         }
 
         h3 {
@@ -276,8 +308,8 @@
             background-color: #0f766e;
         }
 
-        .btn-reset-system {
-            background-color: #dc2626;
+        .btn-review-print {
+            background-color: var(--primary-color);
             color: white;
             border: none;
             padding: 8px 14px;
@@ -311,7 +343,7 @@
         @media print {
             body { background: white; padding: 0; }
             .container { box-shadow: none; padding: 0; }
-            .mode-nav, .session-control-box, .journal-feeder-box, .actions, .btn-clear-mini, .btn-reset-system { display: none !important; }
+            .mode-nav, .session-control-box, .journal-feeder-box, .operator-lock-banner, .actions, .btn-clear-mini, .btn-review-print { display: none !important; }
             .locked-header { -webkit-print-color-adjust: exact; background: #1e3a8a !important; }
             .individual-canvas { border: 1px solid #000 !important; }
             .view-section { display: block !important; }
@@ -340,17 +372,17 @@
     <!-- VIEW 1: LIVE HARI INI -->
     <div id="viewLive" class="view-section active-view">
         <div class="alert-box" id="lockStatusMsg">
-            <span>🔒 <strong>Sistem Terintegrasi:</strong> Lengkapi Teaching-Learning Journal di bawah sebelum menyimpan presensi harian.</span>
-            <button class="btn-reset-system" onclick="resetSystemCache()">⚠️ Reset / Muat Ulang Sistem</button>
+            <span>🔒 <strong>Sistem Terintegrasi & Auto-Save:</strong> Jurnal dikunci untuk operator, peserta mengisi absen & tanda tangan.</span>
+            <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>
         </div>
 
         <div class="session-control-box">
             <div class="control-group">
-                <label>Tanggal Otomatis (System Clock):</label>
+                <label>Tanggal Otomatis (Live System Clock):</label>
                 <input type="date" id="liveDate" readonly style="background:#e2e8f0; font-weight:bold; cursor:not-allowed;">
             </div>
             <div class="control-group">
-                <label>Sub-Materi / Kompetensi Aktif (Auto-Switch):</label>
+                <label>Sub-Materi / Kompetensi Aktif:</label>
                 <select id="liveSector" onchange="updateSectorDetails()"></select>
             </div>
             <div class="control-group">
@@ -359,28 +391,36 @@
             </div>
         </div>
 
+        <!-- OPERATOR PASSWORD PROTECTION BANNER FOR JOURNAL -->
+        <div class="operator-lock-banner" id="operatorLockBanner">
+            <div>
+                <strong>🔒 Akses Jurnal Pembelajaran Terkunci:</strong> Hanya Operator/Trainer yang dapat mengisi/mengubah jurnal pembelajaran dengan memasukkan kata sandi.
+            </div>
+            <button class="btn-unlock" onclick="unlockJournalForm()">🔓 Buka dengan Sandi</button>
+        </div>
+
         <!-- FEEDER TEACHING-LEARNING JOURNAL -->
-        <div class="journal-feeder-box">
+        <div class="journal-feeder-box" id="journalFeederBox" style="opacity: 0.6; pointer-events: none;">
             <h4>
                 <span>📖 Feeder: Teaching-Learning Journal (Input Trainer Harian)</span>
-                <span style="font-size: 0.75rem; font-weight: normal; color: #047857;">Sesuai Alokasi 8 JPL</span>
+                <span style="font-size: 0.75rem; color: #047857;" id="journalStatusLabel">Status: Terkunci (Perlu Sandi Fakinah_1)</span>
             </h4>
             <div class="journal-grid">
                 <div class="journal-group">
                     <label>Materi Pokok / Sub-Topik Pembelajaran Hari Ini:</label>
-                    <input type="text" id="jnlTopic" placeholder="Contoh: Praktik Klinis Prosedur Keperawatan & Terminologi Medis...">
+                    <input type="text" id="jnlTopic" placeholder="Contoh: Praktik Klinis Prosedur Keperawatan & Terminologi Medis..." disabled>
                 </div>
                 <div class="journal-group">
                     <label>Metode & Strategi Penyampaian Trainer:</label>
-                    <input type="text" id="jnlMethod" placeholder="Contoh: Simulasi Bedah Kasus, Diskusi Interaktif & Drill 21x...">
+                    <input type="text" id="jnlMethod" placeholder="Contoh: Simulasi Bedah Kasus, Diskusi Interaktif & Drill 21x..." disabled>
                 </div>
                 <div class="journal-group">
                     <label>Kendala / Hambatan Kelas (Jika Ada):</label>
-                    <textarea id="jnlObstacle" placeholder="Catat hambatan pemahaman peserta atau teknis kelas..."></textarea>
+                    <textarea id="jnlObstacle" placeholder="Catat hambatan pemahaman peserta atau teknis kelas..." disabled></textarea>
                 </div>
                 <div class="journal-group">
                     <label>Catatan Evaluasi / Tindak Lanjut Besok:</label>
-                    <textarea id="jnlEvaluation" placeholder="Catat progress penyerapan target kompetensi..."></textarea>
+                    <textarea id="jnlEvaluation" placeholder="Catat progress penyerapan target kompetensi..." disabled></textarea>
                 </div>
             </div>
         </div>
@@ -401,14 +441,14 @@
 
         <div class="actions">
             <span style="font-size: 0.85rem; color: #166534; font-weight: bold;" id="liveMsg"></span>
-            <button class="btn-export" id="btnSaveRecord" onclick="saveAndRecordSession()">💾 Simpan Jurnal & Presensi (Potong 8 JPL)</button>
+            <button class="btn-export" id="btnSaveRecord" onclick="saveAndRecordSession()">💾 Simpan Jurnal & Kunci Presensi (Sent)</button>
         </div>
     </div>
 
     <!-- VIEW 2: WEEKLY REPORT -->
     <div id="viewWeekly" class="view-section">
         <h3>📅 Weekly Report & Teaching Journal (Rekapitulasi Mingguan)</h3>
-        <p style="font-size: 0.88rem; color: #64748b;">Akumulasi jurnal mengajar trainer dan rekapitulasi kehadiran peserta mingguan.</p>
+        <p style="font-size: 0.88rem; color: #64748b;">Arsip review laporan harian & mingguan yang siap dicetak.</p>
         
         <div id="weeklyJournalContainer" style="margin-bottom: 25px;"></div>
 
@@ -457,14 +497,14 @@
 </div>
 
 <script>
-    // Daftar Peserta Sesuai Urutan Lembar Kerja Terbaru
+    // 20 Nama Peserta yang sudah dibenahi secara urut & presisi
     const students = [
         "Putri Intan Ridayana", 
         "Elya Susanti", 
         "Maulidar", 
         "Anis Sagita", 
-        "Intan Susrika", 
-        "Delvira Milda", 
+        "Intan Sasrika", 
+        "Delfira Milda", 
         "Safira Kemala Putri", 
         "Rahmatillah", 
         "Rizki Febriwanti", 
@@ -474,14 +514,13 @@
         "Miftahul Hasanah", 
         "Qhotorun Nada Sari", 
         "Maisarah", 
-        "Nadaria", 
+        "Nadariah", 
         "Irmanda Putri Safira", 
         "Ayu Anggira Effendi", 
         "Nadia Vonna", 
         "Fitriani"
     ];
 
-    // Master Kurikulum dengan Sektor 4.1, 4.2, 4.3 Terintegrasi Penuh
     const sectorsMaster = [
         { id: "eng_pattern", name: "1.1 English Basic Pattern", totalJpl: 15 },
         { id: "eng_pos", name: "1.2 English Parts of Speech", totalJpl: 10 },
@@ -509,14 +548,37 @@
     ];
 
     let activeContexts = {};
-    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_logs_v13') || '{}');
-    const todayStr = new Date().toISOString().split('T')[0];
+    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_logs_v16') || '{}');
+    let isJournalUnlocked = false;
+    
+    function getCurrentLocalDate() {
+        return new Date().toLocaleDateString('en-CA');
+    }
 
     function getInstructorForSector(sectorId) {
         if (sectorId === "nurs_sop" || sectorId === "nurs_daily" || sectorId === "nurs_treat") {
             return "Rizkia Fanna";
         }
         return "Giyono Asfarrasyid";
+    }
+
+    function unlockJournalForm() {
+        const inputPwd = prompt("Masukkan Kata Sandi Operator (Fakinah_1):");
+        if(inputPwd === "Fakinah_1") {
+            isJournalUnlocked = true;
+            document.getElementById('journalFeederBox').style.opacity = '1';
+            document.getElementById('journalFeederBox').style.pointerEvents = 'auto';
+            document.getElementById('jnlTopic').disabled = false;
+            document.getElementById('jnlMethod').disabled = false;
+            document.getElementById('jnlObstacle').disabled = false;
+            document.getElementById('jnlEvaluation').disabled = false;
+            document.getElementById('operatorLockBanner').style.background = '#d1fae5';
+            document.getElementById('operatorLockBanner').style.borderColor = '#10b981';
+            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Dibuka:</strong> Anda memiliki hak akses penuh untuk mengisi Teaching-Learning Journal.</div>';
+            alert("Kata sandi benar! Jurnal pembelajaran berhasil dibuka.");
+        } else if(inputPwd !== null) {
+            alert("Kata sandi salah! Akses ditolak.");
+        }
     }
 
     function switchView(mode) {
@@ -602,14 +664,15 @@
     }
 
     function buildLiveRoster() {
+        const currentDate = getCurrentLocalDate();
         const dateInput = document.getElementById('liveDate');
-        if(dateInput) dateInput.value = todayStr;
+        if(dateInput) dateInput.value = currentDate;
         
         populateSectorDropdown();
 
         const selectSec = document.getElementById('liveSector');
         const sectorVal = selectSec ? selectSec.value : "eng_pattern";
-        const key = `${todayStr}_Sub_${sectorVal}`;
+        const key = `${currentDate}_Sub_${sectorVal}`;
         const existingData = recordedSessions[key];
 
         const tbody = document.getElementById('liveRosterBody');
@@ -621,10 +684,9 @@
         if(existingData) {
             if(saveBtn) saveBtn.style.display = 'none';
             if(lockMsg) {
-                lockMsg.innerHTML = `<span>🔒 <strong>Sesi Hari Ini Sudah Dikunci:</strong> Presensi & Jurnal tanggal ${todayStr} untuk modul ini telah tersimpan permanen.</span> <button class="btn-reset-system" onclick="resetSystemCache()">⚠️ Reset / Muat Ulang Sistem</button>`;
+                lockMsg.innerHTML = `<span>🔒 <strong>Data Terkunci (Sent):</strong> Jurnal & Presensi tanggal ${currentDate} untuk modul ini telah disimpan permanen.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
             }
 
-            // Load existing journal data into inputs for viewing
             if(existingData.journal) {
                 document.getElementById('jnlTopic').value = existingData.journal.topic || '';
                 document.getElementById('jnlMethod').value = existingData.journal.method || '';
@@ -651,14 +713,17 @@
 
         if(saveBtn) saveBtn.style.display = 'inline-block';
         if(lockMsg) {
-            lockMsg.innerHTML = `<span>🔒 <strong>Jadwal Normal Aktif (08.00 WIB):</strong> Isi Jurnal Mengajar dan Presensi harian (8 JPL).</span> <button class="btn-reset-system" onclick="resetSystemCache()">⚠️ Reset / Muat Ulang Sistem</button>`;
+            lockMsg.innerHTML = `<span>🔒 <strong>Sesi Aktif:</strong> Silakan tandai kehadiran & tanda tangan. Jurnal memerlukan sandi operator.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
         }
 
-        // Reset journal form for new session
-        document.getElementById('jnlTopic').value = '';
-        document.getElementById('jnlMethod').value = '';
-        document.getElementById('jnlObstacle').value = '';
-        document.getElementById('jnlEvaluation').value = '';
+        if(!isJournalUnlocked) {
+            document.getElementById('journalFeederBox').style.opacity = '0.6';
+            document.getElementById('journalFeederBox').style.pointerEvents = 'none';
+            document.getElementById('jnlTopic').disabled = true;
+            document.getElementById('jnlMethod').disabled = true;
+            document.getElementById('jnlObstacle').disabled = true;
+            document.getElementById('jnlEvaluation').disabled = true;
+        }
 
         students.forEach((name, idx) => {
             let row = `
@@ -741,14 +806,14 @@
     }
 
     function saveAndRecordSession() {
+        const currentDate = getCurrentLocalDate();
         const selectSec = document.getElementById('liveSector');
         if(!selectSec) return;
         const sectorVal = selectSec.value;
         const sectorObj = sectorsMaster.find(s => s.id == sectorVal);
         const assignedInstructor = getInstructorForSector(sectorVal);
-        const key = `${todayStr}_Sub_${sectorVal}`;
+        const key = `${currentDate}_Sub_${sectorVal}`;
 
-        // Collect Journal Feeder Data
         const journalData = {
             topic: document.getElementById('jnlTopic').value || 'Materi Harian Standar',
             method: document.getElementById('jnlMethod').value || 'Tatap Muka & Praktik',
@@ -775,21 +840,21 @@
         });
 
         recordedSessions[key] = {
-            date: todayStr,
+            date: currentDate,
             sectorInfo: `${sectorObj.name} (8 JPL)`,
             instructor: assignedInstructor,
             journal: journalData,
             students: studentLogs
         };
 
-        localStorage.setItem('bp3mi_attendance_logs_v13', JSON.stringify(recordedSessions));
+        localStorage.setItem('bp3mi_attendance_logs_v16', JSON.stringify(recordedSessions));
 
         const msgSpan = document.getElementById('liveMsg');
-        if(msgSpan) msgSpan.innerText = "✅ Jurnal & Presensi Tersimpan Permanent (8 JPL Dipotong)!";
+        if(msgSpan) msgSpan.innerText = "✅ Jurnal & Tanda Tangan Berhasil Disimpan & Dikunci (Sent)!";
         setTimeout(() => { 
             if(msgSpan) msgSpan.innerText = ""; 
-            buildLiveRoster();
-        }, 1500);
+            switchView('weekly');
+        }, 1200);
     }
 
     function renderReportData(tableBodyId, journalContainerId) {
@@ -811,7 +876,6 @@
         keys.forEach(key => {
             const session = recordedSessions[key];
             
-            // Render Journal Card
             if(session.journal) {
                 jnlContainer.innerHTML += `
                     <div class="print-journal-card">
@@ -823,7 +887,6 @@
                 `;
             }
 
-            // Render Attendance Roster Rows
             const sessionLogs = session.students || {};
             Object.keys(sessionLogs).forEach(idx => {
                 const log = sessionLogs[idx];
@@ -841,16 +904,12 @@
         });
     }
 
-    function resetSystemCache() {
-        if(confirm("Apakah Anda ingin mereset cache log presensi & jurnal trainer?")) {
-            for(let i = 1; i <= 13; i++) {
-                localStorage.removeItem(`bp3mi_attendance_logs_v${i}`);
-            }
-            recordedSessions = {};
+    setInterval(() => {
+        const dateInput = document.getElementById('liveDate');
+        if(dateInput && dateInput.value !== getCurrentLocalDate()) {
             buildLiveRoster();
-            alert("Sistem berhasil disegarkan!");
         }
-    }
+    }, 60000);
 
     window.onload = function() {
         buildLiveRoster();
