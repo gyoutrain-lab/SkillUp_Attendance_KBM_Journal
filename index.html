@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Presensi & Teaching-Learning Journal - BP3MI Aceh</title>
     
-    <!-- Open Graph / Social Media Thumbnail Meta Tags -->
+    <!-- Open Graph / Social Media Thumbnail Meta Tags (WhatsApp, Facebook, LinkedIn) -->
     <meta property="og:title" content="Sistem Presensi & Teaching-Learning Journal - BP3MI Aceh">
     <meta property="og:description" content="Sistem Terintegrasi Peningkatan Kapasitas Calon Pekerja Migran Program SMK Go Global - BP3MI Aceh">
-    <meta property="og:image" content="https://raw.githubusercontent.com/gyoutrain-lab/SkillUp_Eng_Tenses/main/bp3mi_fakinah.jpg">
+    <meta property="og:image" content="https://raw.githubusercontent.com/gyoutrain-lab/SkillUp_Attendance_KBM_Journal/main/bp3mi_fakinah.jpg">
+    <meta property="og:url" content="https://github.com/gyoutrain-lab/SkillUp_Attendance_KBM_Journal">
     <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Sistem Presensi & Teaching-Learning Journal - BP3MI Aceh">
     <meta name="twitter:description" content="Sistem Terintegrasi Peningkatan Kapasitas Calon Pekerja Migran Program SMK Go Global - BP3MI Aceh">
-    <meta name="twitter:image" content="https://raw.githubusercontent.com/gyoutrain-lab/SkillUp_Eng_Tenses/main/bp3mi_fakinah.jpg">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/gyoutrain-lab/SkillUp_Attendance_KBM_Journal/main/bp3mi_fakinah.jpg">
 
     <style>
         :root {
@@ -194,6 +197,34 @@
             font-size: 0.82rem;
         }
 
+        .operator-review-panel {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .operator-review-panel h4 {
+            margin: 0 0 8px 0;
+            color: #1e40af;
+            font-size: 0.95rem;
+        }
+
+        .review-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 8px;
+            max-height: 160px;
+            overflow-y: auto;
+            background: white;
+            padding: 10px;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
         h3 {
             color: var(--primary-color);
             margin-top: 15px;
@@ -343,7 +374,7 @@
         @media print {
             body { background: white; padding: 0; }
             .container { box-shadow: none; padding: 0; }
-            .mode-nav, .session-control-box, .journal-feeder-box, .operator-lock-banner, .actions, .btn-clear-mini, .btn-review-print { display: none !important; }
+            .mode-nav, .session-control-box, .journal-feeder-box, .operator-lock-banner, .operator-review-panel, .actions, .btn-clear-mini, .btn-review-print { display: none !important; }
             .locked-header { -webkit-print-color-adjust: exact; background: #1e3a8a !important; }
             .individual-canvas { border: 1px solid #000 !important; }
             .view-section { display: block !important; }
@@ -372,7 +403,7 @@
     <!-- VIEW 1: LIVE HARI INI -->
     <div id="viewLive" class="view-section active-view">
         <div class="alert-box" id="lockStatusMsg">
-            <span>🔒 <strong>Sistem Terintegrasi & Auto-Save:</strong> Jurnal dikunci untuk operator, peserta mengisi absen & tanda tangan.</span>
+            <span>🔒 <strong>Sistem Terintegrasi:</strong> Pemilihan kompetensi & jurnal dikunci untuk operator, peserta mengisi absen & tanda tangan.</span>
             <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>
         </div>
 
@@ -383,7 +414,8 @@
             </div>
             <div class="control-group">
                 <label>Sub-Materi / Kompetensi Aktif:</label>
-                <select id="liveSector" onchange="updateSectorDetails()"></select>
+                <!-- Terkunci secara default bagi peserta, hanya terbuka via password operator -->
+                <select id="liveSector" disabled onchange="updateSectorDetails()" style="background:#e2e8f0; cursor:not-allowed;"></select>
             </div>
             <div class="control-group">
                 <label>Alokasi Harian (8 JPL / 360 Menit):</label>
@@ -391,12 +423,19 @@
             </div>
         </div>
 
-        <!-- OPERATOR PASSWORD PROTECTION BANNER FOR JOURNAL -->
+        <!-- OPERATOR PASSWORD PROTECTION BANNER -->
         <div class="operator-lock-banner" id="operatorLockBanner">
             <div>
-                <strong>🔒 Akses Jurnal Pembelajaran Terkunci:</strong> Hanya Operator/Trainer yang dapat mengisi/mengubah jurnal pembelajaran dengan memasukkan kata sandi.
+                <strong>🔒 Akses Operator Terkunci:</strong> Masukkan sandi operator untuk memilih kompetensi, mengisi jurnal, dan mereview tanda tangan peserta.
             </div>
-            <button class="btn-unlock" onclick="unlockJournalForm()">🔓 Buka dengan Sandi</button>
+            <button class="btn-unlock" onclick="unlockOperatorMode()">🔓 Buka dengan Sandi (Fakinah_1)</button>
+        </div>
+
+        <!-- OPERATOR LIVE REVIEW PANEL (MUNCUL SETELAH UNLOCK) -->
+        <div class="operator-review-panel" id="operatorReviewPanel">
+            <h4>👀 Panel Monitoring Operator: Status Tanda Tangan Peserta (Real-Time)</h4>
+            <div style="font-size: 0.82rem; margin-bottom: 8px; color: #1e40af;">Cek apakah peserta sudah membubuhkan tanda tangan sebelum sesi dikunci dan disimpan:</div>
+            <div class="review-status-grid" id="reviewStatusGrid"></div>
         </div>
 
         <!-- FEEDER TEACHING-LEARNING JOURNAL -->
@@ -548,8 +587,8 @@
     ];
 
     let activeContexts = {};
-    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_logs_v16') || '{}');
-    let isJournalUnlocked = false;
+    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_logs_v17') || '{}');
+    let isOperatorUnlocked = false;
     
     function getCurrentLocalDate() {
         return new Date().toLocaleDateString('en-CA');
@@ -562,23 +601,61 @@
         return "Giyono Asfarrasyid";
     }
 
-    function unlockJournalForm() {
+    function unlockOperatorMode() {
         const inputPwd = prompt("Masukkan Kata Sandi Operator (Fakinah_1):");
         if(inputPwd === "Fakinah_1") {
-            isJournalUnlocked = true;
+            isOperatorUnlocked = true;
+            
+            // Buka akses dropdown kompetensi
+            const liveSectorSelect = document.getElementById('liveSector');
+            liveSectorSelect.disabled = false;
+            liveSectorSelect.style.background = '#ffffff';
+            liveSectorSelect.style.cursor = 'pointer';
+
+            // Buka akses feeder jurnal
             document.getElementById('journalFeederBox').style.opacity = '1';
             document.getElementById('journalFeederBox').style.pointerEvents = 'auto';
             document.getElementById('jnlTopic').disabled = false;
             document.getElementById('jnlMethod').disabled = false;
             document.getElementById('jnlObstacle').disabled = false;
             document.getElementById('jnlEvaluation').disabled = false;
+            
             document.getElementById('operatorLockBanner').style.background = '#d1fae5';
             document.getElementById('operatorLockBanner').style.borderColor = '#10b981';
-            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Dibuka:</strong> Anda memiliki hak akses penuh untuk mengisi Teaching-Learning Journal.</div>';
-            alert("Kata sandi benar! Jurnal pembelajaran berhasil dibuka.");
+            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Aktif:</strong> Anda dapat memilih kompetensi, mengisi jurnal, dan memonitor tanda tangan peserta.</div>';
+            
+            document.getElementById('operatorReviewPanel').style.display = 'block';
+            updateOperatorReviewStatus();
+            alert("Kata sandi benar! Pemilihan kompetensi, jurnal, dan panel review tanda tangan berhasil dibuka.");
         } else if(inputPwd !== null) {
             alert("Kata sandi salah! Akses ditolak.");
         }
+    }
+
+    function updateOperatorReviewStatus() {
+        const grid = document.getElementById('reviewStatusGrid');
+        if(!grid) return;
+        grid.innerHTML = "";
+
+        students.forEach((name, idx) => {
+            const canvas = document.getElementById(`canvas_${idx}`);
+            let isSigned = false;
+            if(canvas && activeContexts[idx]) {
+                const blank = document.createElement('canvas');
+                blank.width = canvas.width;
+                blank.height = canvas.height;
+                if(canvas.toDataURL() !== blank.toDataURL()) {
+                    isSigned = true;
+                }
+            }
+
+            grid.innerHTML += `
+                <div style="padding: 4px 8px; border-bottom: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${idx + 1}. ${name}</span>
+                    <span>${isSigned ? '<strong style="color:#059669;">✔ Sudah TTD</strong>' : '<span style="color:#dc2626; font-style:italic;">Belum TTD</span>'}</span>
+                </div>
+            `;
+        });
     }
 
     function switchView(mode) {
@@ -684,7 +761,7 @@
         if(existingData) {
             if(saveBtn) saveBtn.style.display = 'none';
             if(lockMsg) {
-                lockMsg.innerHTML = `<span>🔒 <strong>Data Terkunci (Sent):</strong> Jurnal & Presensi tanggal ${currentDate} untuk modul ini telah disimpan permanen.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
+                lockMsg.innerHTML = `<span>🔒 <strong>Data Terkunci (Sent):</strong> Jurnal & Presensi tanggal ${currentDate} telah disimpan permanen.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
             }
 
             if(existingData.journal) {
@@ -693,6 +770,8 @@
                 document.getElementById('jnlObstacle').value = existingData.journal.obstacle || '';
                 document.getElementById('jnlEvaluation').value = existingData.journal.evaluation || '';
             }
+
+            document.getElementById('operatorReviewPanel').style.display = 'none';
 
             students.forEach((name, idx) => {
                 const log = existingData.students ? (existingData.students[idx] || {}) : {};
@@ -713,16 +792,29 @@
 
         if(saveBtn) saveBtn.style.display = 'inline-block';
         if(lockMsg) {
-            lockMsg.innerHTML = `<span>🔒 <strong>Sesi Aktif:</strong> Silakan tandai kehadiran & tanda tangan. Jurnal memerlukan sandi operator.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
+            lockMsg.innerHTML = `<span>🔒 <strong>Sesi Aktif:</strong> Silakan tandai kehadiran & tanda tangan peserta.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
         }
 
-        if(!isJournalUnlocked) {
+        if(!isOperatorUnlocked) {
+            const liveSectorSelect = document.getElementById('liveSector');
+            liveSectorSelect.disabled = true;
+            liveSectorSelect.style.background = '#e2e8f0';
+            liveSectorSelect.style.cursor = 'not-allowed';
+
             document.getElementById('journalFeederBox').style.opacity = '0.6';
             document.getElementById('journalFeederBox').style.pointerEvents = 'none';
             document.getElementById('jnlTopic').disabled = true;
             document.getElementById('jnlMethod').disabled = true;
             document.getElementById('jnlObstacle').disabled = true;
             document.getElementById('jnlEvaluation').disabled = true;
+            document.getElementById('operatorReviewPanel').style.display = 'none';
+        } else {
+            const liveSectorSelect = document.getElementById('liveSector');
+            liveSectorSelect.disabled = false;
+            liveSectorSelect.style.background = '#ffffff';
+            liveSectorSelect.style.cursor = 'pointer';
+
+            document.getElementById('operatorReviewPanel').style.display = 'block';
         }
 
         students.forEach((name, idx) => {
@@ -748,6 +840,7 @@
             students.forEach((_, idx) => {
                 initCanvas(idx);
             });
+            if(isOperatorUnlocked) updateOperatorReviewStatus();
         }, 100);
     }
 
@@ -765,6 +858,10 @@
 
         activeContexts[idx] = { canvas, ctx, isDrawing: false };
 
+        const triggerUpdate = () => {
+            if(isOperatorUnlocked) updateOperatorReviewStatus();
+        };
+
         canvas.onmousedown = (e) => {
             activeContexts[idx].isDrawing = true;
             ctx.beginPath();
@@ -774,8 +871,9 @@
             if (!activeContexts[idx].isDrawing) return;
             ctx.lineTo(e.offsetX, e.offsetY);
             ctx.stroke();
+            triggerUpdate();
         };
-        canvas.onmouseup = () => activeContexts[idx].isDrawing = false;
+        canvas.onmouseup = () => { activeContexts[idx].isDrawing = false; triggerUpdate(); };
         canvas.onmouseleave = () => activeContexts[idx].isDrawing = false;
 
         canvas.ontouchstart = (e) => {
@@ -793,8 +891,9 @@
             const touch = e.touches[0];
             ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
             ctx.stroke();
+            triggerUpdate();
         };
-        canvas.ontouchend = () => activeContexts[idx].isDrawing = false;
+        canvas.ontouchend = () => { activeContexts[idx].isDrawing = false; triggerUpdate(); };
     }
 
     function clearSig(idx) {
@@ -802,6 +901,7 @@
         if (activeContexts[idx]) {
             const { ctx } = activeContexts[idx];
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if(isOperatorUnlocked) updateOperatorReviewStatus();
         }
     }
 
@@ -829,7 +929,12 @@
             
             let sigData = "";
             if(canvas && activeContexts[idx]) {
-                sigData = canvas.toDataURL();
+                const blank = document.createElement('canvas');
+                blank.width = canvas.width;
+                blank.height = canvas.height;
+                if(canvas.toDataURL() !== blank.toDataURL()) {
+                    sigData = canvas.toDataURL();
+                }
             }
 
             studentLogs[idx] = {
@@ -847,7 +952,7 @@
             students: studentLogs
         };
 
-        localStorage.setItem('bp3mi_attendance_logs_v16', JSON.stringify(recordedSessions));
+        localStorage.setItem('bp3mi_attendance_logs_v17', JSON.stringify(recordedSessions));
 
         const msgSpan = document.getElementById('liveMsg');
         if(msgSpan) msgSpan.innerText = "✅ Jurnal & Tanda Tangan Berhasil Disimpan & Dikunci (Sent)!";
