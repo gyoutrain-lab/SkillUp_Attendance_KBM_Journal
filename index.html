@@ -403,7 +403,7 @@
     <!-- VIEW 1: LIVE HARI INI -->
     <div id="viewLive" class="view-section active-view">
         <div class="alert-box" id="lockStatusMsg">
-            <span>🔒 <strong>Sistem Terintegrasi:</strong> Pemilihan kompetensi & jurnal dikunci untuk operator, peserta mengisi absen & tanda tangan.</span>
+            <span>🔒 <strong>Sistem Terintegrasi:</strong> Pilihan kompetensi & jurnal harian dikunci permanen untuk hari ini setelah disimpan operator.</span>
             <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>
         </div>
 
@@ -414,8 +414,8 @@
             </div>
             <div class="control-group">
                 <label>Sub-Materi / Kompetensi Aktif:</label>
-                <!-- Terkunci secara default bagi peserta, hanya terbuka via password operator -->
-                <select id="liveSector" disabled onchange="updateSectorDetails()" style="background:#e2e8f0; cursor:not-allowed;"></select>
+                <!-- Terkunci jika sudah disimpan untuk hari ini -->
+                <select id="liveSector" onchange="updateSectorDetails()" style="background:#e2e8f0; cursor:not-allowed;"></select>
             </div>
             <div class="control-group">
                 <label>Alokasi Harian (8 JPL / 360 Menit):</label>
@@ -426,7 +426,7 @@
         <!-- OPERATOR PASSWORD PROTECTION BANNER -->
         <div class="operator-lock-banner" id="operatorLockBanner">
             <div>
-                <strong>🔒 Akses Operator Terkunci:</strong> Masukkan sandi operator untuk memilih kompetensi, mengisi jurnal, dan mereview tanda tangan peserta.
+                <strong>🔒 Akses Operator Terkunci:</strong> Masukkan sandi operator untuk memilih kompetensi, mengisi jurnal harian, dan mengunci sesi hari ini.
             </div>
             <button class="btn-unlock" onclick="unlockOperatorMode()">🔓 Buka dengan Sandi (Fakinah_1)</button>
         </div>
@@ -480,7 +480,7 @@
 
         <div class="actions">
             <span style="font-size: 0.85rem; color: #166534; font-weight: bold;" id="liveMsg"></span>
-            <button class="btn-export" id="btnSaveRecord" onclick="saveAndRecordSession()">💾 Simpan Jurnal & Kunci Presensi (Sent)</button>
+            <button class="btn-export" id="btnSaveRecord" onclick="saveAndRecordSession()">💾 Simpan Jurnal & Kunci Sesi Hari Ini (Permanent)</button>
         </div>
     </div>
 
@@ -587,7 +587,7 @@
     ];
 
     let activeContexts = {};
-    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_logs_v17') || '{}');
+    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_logs_v18') || '{}');
     let isOperatorUnlocked = false;
     
     function getCurrentLocalDate() {
@@ -602,6 +602,14 @@
     }
 
     function unlockOperatorMode() {
+        const currentDate = getCurrentLocalDate();
+        const existingKey = Object.keys(recordedSessions).find(k => k.startsWith(currentDate));
+        
+        if(existingKey) {
+            alert("Sesi dan jurnal untuk hari ini sudah dikunci permanen. Operator hanya dapat mengisi baru pada pergantian hari esok.");
+            return;
+        }
+
         const inputPwd = prompt("Masukkan Kata Sandi Operator (Fakinah_1):");
         if(inputPwd === "Fakinah_1") {
             isOperatorUnlocked = true;
@@ -622,11 +630,11 @@
             
             document.getElementById('operatorLockBanner').style.background = '#d1fae5';
             document.getElementById('operatorLockBanner').style.borderColor = '#10b981';
-            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Aktif:</strong> Anda dapat memilih kompetensi, mengisi jurnal, dan memonitor tanda tangan peserta.</div>';
+            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Aktif:</strong> Silakan tentukan kompetensi dan isi jurnal hari ini, lalu simpan agar terkunci permanen.</div>';
             
             document.getElementById('operatorReviewPanel').style.display = 'block';
             updateOperatorReviewStatus();
-            alert("Kata sandi benar! Pemilihan kompetensi, jurnal, dan panel review tanda tangan berhasil dibuka.");
+            alert("Kata sandi benar! Silakan tentukan pilihan kompetensi dan jurnal mengajar.");
         } else if(inputPwd !== null) {
             alert("Kata sandi salah! Akses ditolak.");
         }
@@ -684,12 +692,12 @@
     function getSectorRemainingJpl(sectorId) {
         let usedJpl = 0;
         Object.keys(recordedSessions).forEach(key => {
-            if(key.includes(`Sub_${sectorId}`)) {
+            if(recordedSessions[key].sectorId === sectorId) {
                 usedJpl += 8;
             }
         });
         const sector = sectorsMaster.find(s => s.id === sectorId);
-        return Math.max(0, sector.totalJpl - usedJpl);
+        return sector ? Math.max(0, sector.totalJpl - usedJpl) : 0;
     }
 
     function populateSectorDropdown() {
@@ -747,21 +755,28 @@
         
         populateSectorDropdown();
 
-        const selectSec = document.getElementById('liveSector');
-        const sectorVal = selectSec ? selectSec.value : "eng_pattern";
-        const key = `${currentDate}_Sub_${sectorVal}`;
-        const existingData = recordedSessions[key];
-
+        const existingKey = Object.keys(recordedSessions).find(k => k.startsWith(currentDate));
         const tbody = document.getElementById('liveRosterBody');
         const saveBtn = document.getElementById('btnSaveRecord');
         const lockMsg = document.getElementById('lockStatusMsg');
+        const liveSectorSelect = document.getElementById('liveSector');
         if(!tbody) return;
         tbody.innerHTML = "";
 
-        if(existingData) {
+        if(existingKey) {
+            // JIKA HARI INI SUDAH DISIMPAN/DIKUNCI OLEH OPERATOR
+            const existingData = recordedSessions[existingKey];
             if(saveBtn) saveBtn.style.display = 'none';
             if(lockMsg) {
-                lockMsg.innerHTML = `<span>🔒 <strong>Data Terkunci (Sent):</strong> Jurnal & Presensi tanggal ${currentDate} telah disimpan permanen.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
+                lockMsg.innerHTML = `<span>🔒 <strong>Terkunci Permanen:</strong> Kompetensi & Jurnal tanggal ${currentDate} telah ditetapkan operator dan aktif hingga pukul 00.00 nanti.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
+            }
+
+            // Set dropdown ke nilai yang dikunci hari ini
+            if(liveSectorSelect) {
+                liveSectorSelect.value = existingData.sectorId || '';
+                liveSectorSelect.disabled = true;
+                liveSectorSelect.style.background = '#e2e8f0';
+                liveSectorSelect.style.cursor = 'not-allowed';
             }
 
             if(existingData.journal) {
@@ -771,7 +786,18 @@
                 document.getElementById('jnlEvaluation').value = existingData.journal.evaluation || '';
             }
 
+            // Matikan form jurnal
+            document.getElementById('journalFeederBox').style.opacity = '0.8';
+            document.getElementById('journalFeederBox').style.pointerEvents = 'none';
+            document.getElementById('jnlTopic').disabled = true;
+            document.getElementById('jnlMethod').disabled = true;
+            document.getElementById('jnlObstacle').disabled = true;
+            document.getElementById('jnlEvaluation').disabled = true;
             document.getElementById('operatorReviewPanel').style.display = 'none';
+            
+            document.getElementById('operatorLockBanner').style.background = '#f1f5f9';
+            document.getElementById('operatorLockBanner').style.borderColor = '#cbd5e1';
+            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>🔒 Sesi Hari Ini Telah Terkunci:</strong> Kompetensi dan jurnal mengajar bersifat permanen untuk hari ini dan akan mereset otomatis pada pergantian hari baru (00.00 WIB).</div>';
 
             students.forEach((name, idx) => {
                 const log = existingData.students ? (existingData.students[idx] || {}) : {};
@@ -790,16 +816,18 @@
             return;
         }
 
+        // JIKA BELUM ADA PENGISIAN DI HARI INI (BARU / GANTI HARI)
         if(saveBtn) saveBtn.style.display = 'inline-block';
         if(lockMsg) {
-            lockMsg.innerHTML = `<span>🔒 <strong>Sesi Aktif:</strong> Silakan tandai kehadiran & tanda tangan peserta.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
+            lockMsg.innerHTML = `<span>🔓 <strong>Sesi Baru Hari Ini:</strong> Silakan masukkan sandi operator untuk menentukan kompetensi dan mengisi jurnal harian.</span> <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out</button>`;
         }
 
         if(!isOperatorUnlocked) {
-            const liveSectorSelect = document.getElementById('liveSector');
-            liveSectorSelect.disabled = true;
-            liveSectorSelect.style.background = '#e2e8f0';
-            liveSectorSelect.style.cursor = 'not-allowed';
+            if(liveSectorSelect) {
+                liveSectorSelect.disabled = true;
+                liveSectorSelect.style.background = '#e2e8f0';
+                liveSectorSelect.style.cursor = 'not-allowed';
+            }
 
             document.getElementById('journalFeederBox').style.opacity = '0.6';
             document.getElementById('journalFeederBox').style.pointerEvents = 'none';
@@ -809,11 +837,11 @@
             document.getElementById('jnlEvaluation').disabled = true;
             document.getElementById('operatorReviewPanel').style.display = 'none';
         } else {
-            const liveSectorSelect = document.getElementById('liveSector');
-            liveSectorSelect.disabled = false;
-            liveSectorSelect.style.background = '#ffffff';
-            liveSectorSelect.style.cursor = 'pointer';
-
+            if(liveSectorSelect) {
+                liveSectorSelect.disabled = false;
+                liveSectorSelect.style.background = '#ffffff';
+                liveSectorSelect.style.cursor = 'pointer';
+            }
             document.getElementById('operatorReviewPanel').style.display = 'block';
         }
 
@@ -912,7 +940,7 @@
         const sectorVal = selectSec.value;
         const sectorObj = sectorsMaster.find(s => s.id == sectorVal);
         const assignedInstructor = getInstructorForSector(sectorVal);
-        const key = `${currentDate}_Sub_${sectorVal}`;
+        const key = `${currentDate}_${sectorVal}`;
 
         const journalData = {
             topic: document.getElementById('jnlTopic').value || 'Materi Harian Standar',
@@ -946,19 +974,20 @@
 
         recordedSessions[key] = {
             date: currentDate,
+            sectorId: sectorVal,
             sectorInfo: `${sectorObj.name} (8 JPL)`,
             instructor: assignedInstructor,
             journal: journalData,
             students: studentLogs
         };
 
-        localStorage.setItem('bp3mi_attendance_logs_v17', JSON.stringify(recordedSessions));
+        localStorage.setItem('bp3mi_attendance_logs_v18', JSON.stringify(recordedSessions));
 
         const msgSpan = document.getElementById('liveMsg');
-        if(msgSpan) msgSpan.innerText = "✅ Jurnal & Tanda Tangan Berhasil Disimpan & Dikunci (Sent)!";
+        if(msgSpan) msgSpan.innerText = "✅ Jurnal & Pilihan Kompetensi Berhasil Dikunci Permanen untuk Hari Ini!";
         setTimeout(() => { 
             if(msgSpan) msgSpan.innerText = ""; 
-            switchView('weekly');
+            buildLiveRoster();
         }, 1200);
     }
 
@@ -1012,6 +1041,7 @@
     setInterval(() => {
         const dateInput = document.getElementById('liveDate');
         if(dateInput && dateInput.value !== getCurrentLocalDate()) {
+            isOperatorUnlocked = false;
             buildLiveRoster();
         }
     }, 60000);
