@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Presensi & Teaching-Learning Journal - BP3MI Aceh</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #0d9488;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .locked-header {
+            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .locked-header h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.15rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 8px;
+            color: white !important;
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            font-size: 0.88rem;
+        }
+
+        .mode-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 0.85rem;
+        }
+
+        .nav-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active-view {
+            display: block;
+        }
+
+        .session-control-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.88rem;
+        }
+
+        /* Feeder Teaching Journal Box */
+        .journal-feeder-box {
+            background: #f0fdf4;
+            border: 2px dashed #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .journal-feeder-box h4 {
+            margin: 0 0 10px 0;
+            color: #047857;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .journal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .journal-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: bold;
+            color: #065f46;
+            margin-bottom: 3px;
+        }
+
+        .journal-group textarea, .journal-group input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #a7f3d0;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            background: #ffffff;
+            box-sizing: border-box;
+        }
+
+        .journal-group textarea {
+            resize: vertical;
+            height: 55px;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            margin-top: 15px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+            font-size: 1.05rem;
+        }
+
+        .presence-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.88rem;
+            background: white;
+        }
+
+        .presence-table th, .presence-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            vertical-align: middle;
+        }
+
+        .presence-table th {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .student-number {
+            text-align: center;
+            font-weight: bold;
+            width: 40px;
+        }
+
+        .student-name {
+            font-weight: 600;
+            width: 180px;
+        }
+
+        .checkbox-center {
+            text-align: center;
+            width: 80px;
+        }
+
+        .attendance-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--secondary-color);
+            cursor: pointer;
+        }
+
+        .sig-cell {
+            text-align: center;
+            width: 220px;
+        }
+
+        .individual-canvas {
+            border: 1px dashed #94a3b8;
+            background: #fafafa;
+            cursor: crosshair;
+            display: block;
+            margin: 0 auto;
+            width: 200px;
+            height: 70px;
+            border-radius: 4px;
+            touch-action: none;
+        }
+
+        .sig-preview-img {
+            max-width: 180px;
+            max-height: 60px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .sig-btn-row {
+            margin-top: 4px;
+            font-size: 0.75rem;
+        }
+
+        .btn-clear-mini {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-export {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-export:hover {
+            background-color: #0f766e;
+        }
+
+        .btn-reset-system {
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .alert-box {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .print-journal-card {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary-color);
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; }
+            .mode-nav, .session-control-box, .journal-feeder-box, .actions, .btn-clear-mini, .btn-reset-system { display: none !important; }
+            .locked-header { -webkit-print-color-adjust: exact; background: #1e3a8a !important; }
+            .individual-canvas { border: 1px solid #000 !important; }
+            .view-section { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="locked-header">
+        <h2>BP3MI Aceh & Program Peningkatan Kapasitas Calon Pekerja Migran</h2>
+        <div class="header-grid">
+            <div><strong>Program:</strong> Peningkatan Kapasitas Calon Pekerja Migran Program SMK Go Global</div>
+            <div><strong>Instruktur:</strong> <span id="displayInstructor">Giyono Asfarrasyid</span></div>
+            <div><strong>Standar Harian:</strong> 08:00 - Selesai (8 JPL / Hari @ 45 Menit)</div>
+        </div>
+    </div>
+
+    <!-- NAVIGASI MODE -->
+    <div class="mode-nav">
+        <button class="nav-btn active" id="btnLive" onclick="switchView('live')">🔴 Live Landing Page & Journal</button>
+        <button class="nav-btn" id="btnWeekly" onclick="switchView('weekly')">📅 Weekly Report + Journal</button>
+        <button class="nav-btn" id="btnMonthly" onclick="switchView('monthly')">📊 Monthly Report + Journal</button>
+    </div>
+
+    <!-- VIEW 1: LIVE HARI INI -->
+    <div id="viewLive" class="view-section active-view">
+        <div class="alert-box" id="lockStatusMsg">
+            <span>🔒 <strong>Sistem Terintegrasi:</strong> Lengkapi Teaching-Learning Journal di bawah sebelum menyimpan presensi harian.</span>
+            <button class="btn-reset-system" onclick="resetSystemCache()">⚠️ Reset / Muat Ulang Sistem</button>
+        </div>
+
+        <div class="session-control-box">
+            <div class="control-group">
+                <label>Tanggal Otomatis (System Clock):</label>
+                <input type="date" id="liveDate" readonly style="background:#e2e8f0; font-weight:bold; cursor:not-allowed;">
+            </div>
+            <div class="control-group">
+                <label>Sub-Materi / Kompetensi Aktif (Auto-Switch):</label>
+                <select id="liveSector" onchange="updateSectorDetails()"></select>
+            </div>
+            <div class="control-group">
+                <label>Alokasi Harian (8 JPL / 360 Menit):</label>
+                <input type="text" id="activeSectorInfo" value="08:00 - Selesai (8 JPL dialokasikan)" readonly style="background:#e2e8f0; font-weight:bold;">
+            </div>
+        </div>
+
+        <!-- FEEDER TEACHING-LEARNING JOURNAL -->
+        <div class="journal-feeder-box">
+            <h4>
+                <span>📖 Feeder: Teaching-Learning Journal (Input Trainer Harian)</span>
+                <span style="font-size: 0.75rem; font-weight: normal; color: #047857;">Sesuai Alokasi 8 JPL</span>
+            </h4>
+            <div class="journal-grid">
+                <div class="journal-group">
+                    <label>Materi Pokok / Sub-Topik Pembelajaran Hari Ini:</label>
+                    <input type="text" id="jnlTopic" placeholder="Contoh: Praktik Klinis Prosedur Keperawatan & Terminologi Medis...">
+                </div>
+                <div class="journal-group">
+                    <label>Metode & Strategi Penyampaian Trainer:</label>
+                    <input type="text" id="jnlMethod" placeholder="Contoh: Simulasi Bedah Kasus, Diskusi Interaktif & Drill 21x...">
+                </div>
+                <div class="journal-group">
+                    <label>Kendala / Hambatan Kelas (Jika Ada):</label>
+                    <textarea id="jnlObstacle" placeholder="Catat hambatan pemahaman peserta atau teknis kelas..."></textarea>
+                </div>
+                <div class="journal-group">
+                    <label>Catatan Evaluasi / Tindak Lanjut Besok:</label>
+                    <textarea id="jnlEvaluation" placeholder="Catat progress penyerapan target kompetensi..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <h3 id="liveTitle">Presensi & Tanda Tangan Mandiri Harian (08.00 WIB)</h3>
+
+        <table class="presence-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Peserta Perawat</th>
+                    <th class="checkbox-center">Hadir (✔)</th>
+                    <th>Tanda Tangan Live (Sesi Ini)</th>
+                </tr>
+            </thead>
+            <tbody id="liveRosterBody"></tbody>
+        </table>
+
+        <div class="actions">
+            <span style="font-size: 0.85rem; color: #166534; font-weight: bold;" id="liveMsg"></span>
+            <button class="btn-export" id="btnSaveRecord" onclick="saveAndRecordSession()">💾 Simpan Jurnal & Presensi (Potong 8 JPL)</button>
+        </div>
+    </div>
+
+    <!-- VIEW 2: WEEKLY REPORT -->
+    <div id="viewWeekly" class="view-section">
+        <h3>📅 Weekly Report & Teaching Journal (Rekapitulasi Mingguan)</h3>
+        <p style="font-size: 0.88rem; color: #64748b;">Akumulasi jurnal mengajar trainer dan rekapitulasi kehadiran peserta mingguan.</p>
+        
+        <div id="weeklyJournalContainer" style="margin-bottom: 25px;"></div>
+
+        <table class="presence-table" style="margin-top: 15px;">
+            <thead>
+                <tr>
+                    <th>Tanggal & Sub-Materi Kurikulum</th>
+                    <th>Nama Peserta Perawat</th>
+                    <th class="checkbox-center">Kehadiran</th>
+                    <th>Bukti Tanda Tangan Digital</th>
+                </tr>
+            </thead>
+            <tbody id="weeklyRosterBody"></tbody>
+        </table>
+
+        <div class="actions">
+            <span></span>
+            <button class="btn-export" onclick="window.print()">🖨️ Cetak Weekly Report & Journal</button>
+        </div>
+    </div>
+
+    <!-- VIEW 3: MONTHLY REPORT -->
+    <div id="viewMonthly" class="view-section">
+        <h3>📊 Monthly Report & Teaching Journal (Rekapitulasi Bulanan)</h3>
+        <p style="font-size: 0.88rem; color: #64748b;">Arsip lengkap seluruh jurnal mengajar trainer dan daftar hadir peserta dalam periode bulanan.</p>
+
+        <div id="monthlyJournalContainer" style="margin-bottom: 25px;"></div>
+
+        <table class="presence-table" style="margin-top: 15px;">
+            <thead>
+                <tr>
+                    <th>Tanggal & Sub-Materi Kurikulum</th>
+                    <th>Nama Peserta Perawat</th>
+                    <th class="checkbox-center">Kehadiran</th>
+                    <th>Bukti Tanda Tangan Digital</th>
+                </tr>
+            </thead>
+            <tbody id="monthlyRosterBody"></tbody>
+        </table>
+
+        <div class="actions">
+            <span></span>
+            <button class="btn-export" onclick="window.print()">🖨️ Cetak Monthly Report & Journal</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Daftar Peserta Sesuai Urutan Lembar Kerja Terbaru
+    const students = [
+        "Putri Intan Ridayana", 
+        "Elya Susanti", 
+        "Maulidar", 
+        "Anis Sagita", 
+        "Intan Susrika", 
+        "Delvira Milda", 
+        "Safira Kemala Putri", 
+        "Rahmatillah", 
+        "Rizki Febriwanti", 
+        "Sarah Salsa Fitri", 
+        "Mirdha Rosalinda", 
+        "Fezdriani", 
+        "Miftahul Hasanah", 
+        "Qhotorun Nada Sari", 
+        "Maisarah", 
+        "Nadaria", 
+        "Irmanda Putri Safira", 
+        "Ayu Anggira Effendi", 
+        "Nadia Vonna", 
+        "Fitriani"
+    ];
+
+    // Master Kurikulum dengan Sektor 4.1, 4.2, 4.3 Terintegrasi Penuh
+    const sectorsMaster = [
+        { id: "eng_pattern", name: "1.1 English Basic Pattern", totalJpl: 15 },
+        { id: "eng_pos", name: "1.2 English Parts of Speech", totalJpl: 10 },
+        { id: "eng_tenses", name: "1.3 English Tenses", totalJpl: 45 },
+        { id: "eng_sentences", name: "1.4 English Sentences", totalJpl: 50 },
+        { id: "eng_vocab", name: "1.5 Vocabulary Building", totalJpl: 40 },
+        { id: "prom_intro", name: "2.1 Introduction to Prometric Test", totalJpl: 20 },
+        { id: "prom_compare", name: "2.2 SCFHS vs STR & NCLEX", totalJpl: 10 },
+        { id: "prom_facts", name: "2.3 SCFHS Facts", totalJpl: 20 },
+        { id: "prom_tech", name: "2.4 Practice Simulation: Nurse Technician", totalJpl: 40 },
+        { id: "prom_spec", name: "2.5 Practice Simulation: Nurse Specialist", totalJpl: 30 },
+        { id: "job_rationale", name: "3.1 Job Interview Rationale", totalJpl: 10 },
+        { id: "job_str", name: "3.2 Behavioral STR Technique", totalJpl: 20 },
+        { id: "job_selfintro", name: "3.3 Self Introduction", totalJpl: 25 },
+        { id: "job_cases", name: "3.4 Most Cases & How To", totalJpl: 25 },
+        { id: "job_sim", name: "3.5 Practice Job Interview Simulation", totalJpl: 20 },
+        { id: "nurs_sop", name: "4.1 Nursing Care Standard Procedure", totalJpl: 10 },
+        { id: "nurs_daily", name: "4.2 Daily Life as a Nurse", totalJpl: 10 },
+        { id: "nurs_treat", name: "4.3 How to Practice Clinical Treatment", totalJpl: 60 },
+        { id: 5, name: "5. Ethics & Workplace Adaptation", totalJpl: 50 },
+        { id: 6, name: "6. Global Mobility & Legal Compliance", totalJpl: 50 },
+        { id: 7, name: "7. Daily Life Integration", totalJpl: 40 },
+        { id: 8, name: "8. Certification / Portfolio", totalJpl: 20 },
+        { id: 9, name: "9. Integrated Simulation & Final Assessment", totalJpl: 20 }
+    ];
+
+    let activeContexts = {};
+    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_logs_v13') || '{}');
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    function getInstructorForSector(sectorId) {
+        if (sectorId === "nurs_sop" || sectorId === "nurs_daily" || sectorId === "nurs_treat") {
+            return "Rizkia Fanna";
+        }
+        return "Giyono Asfarrasyid";
+    }
+
+    function switchView(mode) {
+        document.getElementById('viewLive').classList.remove('active-view');
+        document.getElementById('viewWeekly').classList.remove('active-view');
+        document.getElementById('viewMonthly').classList.remove('active-view');
+        document.getElementById('btnLive').classList.remove('active');
+        document.getElementById('btnWeekly').classList.remove('active');
+        document.getElementById('btnMonthly').classList.remove('active');
+
+        if(mode === 'live') {
+            document.getElementById('viewLive').classList.add('active-view');
+            document.getElementById('btnLive').classList.add('active');
+            buildLiveRoster();
+        } else if(mode === 'weekly') {
+            document.getElementById('viewWeekly').classList.add('active-view');
+            document.getElementById('btnWeekly').classList.add('active');
+            renderReportData('weeklyRosterBody', 'weeklyJournalContainer');
+        } else {
+            document.getElementById('viewMonthly').classList.add('active-view');
+            document.getElementById('btnMonthly').classList.add('active');
+            renderReportData('monthlyRosterBody', 'monthlyJournalContainer');
+        }
+    }
+
+    function getSectorRemainingJpl(sectorId) {
+        let usedJpl = 0;
+        Object.keys(recordedSessions).forEach(key => {
+            if(key.includes(`Sub_${sectorId}`)) {
+                usedJpl += 8;
+            }
+        });
+        const sector = sectorsMaster.find(s => s.id === sectorId);
+        return Math.max(0, sector.totalJpl - usedJpl);
+    }
+
+    function populateSectorDropdown() {
+        const select = document.getElementById('liveSector');
+        if(!select) return;
+        select.innerHTML = "";
+        let autoSelectedId = null;
+
+        sectorsMaster.forEach(sec => {
+            const remaining = getSectorRemainingJpl(sec.id);
+            const isCompleted = remaining === 0;
+            const opt = document.createElement('option');
+            opt.value = sec.id;
+            opt.text = `${sec.name} (${remaining}/${sec.totalJpl} Tersisa)` + (isCompleted ? " [ LUNAS / SELESAI ]" : "");
+            
+            if(isCompleted) {
+                opt.disabled = true;
+            } else if(!autoSelectedId) {
+                autoSelectedId = sec.id;
+            }
+            select.appendChild(opt);
+        });
+
+        if(autoSelectedId) {
+            select.value = autoSelectedId;
+        }
+        updateSectorDetails();
+    }
+
+    function updateSectorDetails() {
+        const select = document.getElementById('liveSector');
+        const infoInput = document.getElementById('activeSectorInfo');
+        const displayInst = document.getElementById('displayInstructor');
+        if(!select || !infoInput) return;
+        
+        const val = select.value;
+        const remaining = getSectorRemainingJpl(val);
+        const currentInst = getInstructorForSector(val);
+
+        if(displayInst) {
+            displayInst.innerText = currentInst;
+        }
+        
+        if(remaining > 0) {
+            infoInput.value = `08:00 - Selesai (Alokasi 8 JPL / Sisa: ${remaining} JPL)`;
+        } else {
+            infoInput.value = `Modul Ini Telah Selesai (0 JPL)`;
+        }
+    }
+
+    function buildLiveRoster() {
+        const dateInput = document.getElementById('liveDate');
+        if(dateInput) dateInput.value = todayStr;
+        
+        populateSectorDropdown();
+
+        const selectSec = document.getElementById('liveSector');
+        const sectorVal = selectSec ? selectSec.value : "eng_pattern";
+        const key = `${todayStr}_Sub_${sectorVal}`;
+        const existingData = recordedSessions[key];
+
+        const tbody = document.getElementById('liveRosterBody');
+        const saveBtn = document.getElementById('btnSaveRecord');
+        const lockMsg = document.getElementById('lockStatusMsg');
+        if(!tbody) return;
+        tbody.innerHTML = "";
+
+        if(existingData) {
+            if(saveBtn) saveBtn.style.display = 'none';
+            if(lockMsg) {
+                lockMsg.innerHTML = `<span>🔒 <strong>Sesi Hari Ini Sudah Dikunci:</strong> Presensi & Jurnal tanggal ${todayStr} untuk modul ini telah tersimpan permanen.</span> <button class="btn-reset-system" onclick="resetSystemCache()">⚠️ Reset / Muat Ulang Sistem</button>`;
+            }
+
+            // Load existing journal data into inputs for viewing
+            if(existingData.journal) {
+                document.getElementById('jnlTopic').value = existingData.journal.topic || '';
+                document.getElementById('jnlMethod').value = existingData.journal.method || '';
+                document.getElementById('jnlObstacle').value = existingData.journal.obstacle || '';
+                document.getElementById('jnlEvaluation').value = existingData.journal.evaluation || '';
+            }
+
+            students.forEach((name, idx) => {
+                const log = existingData.students ? (existingData.students[idx] || {}) : {};
+                let row = `
+                    <tr>
+                        <td class="student-number">${idx + 1}</td>
+                        <td class="student-name">${name}</td>
+                        <td class="checkbox-center">${log.present ? '<span style="color:#166534; font-weight:bold;">Hadir (✔)</span>' : '<span style="color:#dc2626;">Tidak Hadir</span>'}</td>
+                        <td class="sig-cell">
+                            ${log.sig ? `<img src="${log.sig}" class="sig-preview-img">` : '<span style="color:#94a3b8; font-style:italic;">[ Kosong ]</span>'}
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            return;
+        }
+
+        if(saveBtn) saveBtn.style.display = 'inline-block';
+        if(lockMsg) {
+            lockMsg.innerHTML = `<span>🔒 <strong>Jadwal Normal Aktif (08.00 WIB):</strong> Isi Jurnal Mengajar dan Presensi harian (8 JPL).</span> <button class="btn-reset-system" onclick="resetSystemCache()">⚠️ Reset / Muat Ulang Sistem</button>`;
+        }
+
+        // Reset journal form for new session
+        document.getElementById('jnlTopic').value = '';
+        document.getElementById('jnlMethod').value = '';
+        document.getElementById('jnlObstacle').value = '';
+        document.getElementById('jnlEvaluation').value = '';
+
+        students.forEach((name, idx) => {
+            let row = `
+                <tr>
+                    <td class="student-number">${idx + 1}</td>
+                    <td class="student-name">${name}</td>
+                    <td class="checkbox-center">
+                        <input type="checkbox" class="attendance-checkbox" checked id="chk_${idx}">
+                    </td>
+                    <td class="sig-cell">
+                        <canvas id="canvas_${idx}" class="individual-canvas" style="display:block;"></canvas>
+                        <div class="sig-btn-row">
+                            <button type="button" class="btn-clear-mini" onclick="clearSig(${idx})">Hapus/Ulang</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+
+        setTimeout(() => {
+            students.forEach((_, idx) => {
+                initCanvas(idx);
+            });
+        }, 100);
+    }
+
+    function initCanvas(idx) {
+        const canvas = document.getElementById(`canvas_${idx}`);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = 200;
+        canvas.height = 70;
+
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        activeContexts[idx] = { canvas, ctx, isDrawing: false };
+
+        canvas.onmousedown = (e) => {
+            activeContexts[idx].isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        };
+        canvas.onmousemove = (e) => {
+            if (!activeContexts[idx].isDrawing) return;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        };
+        canvas.onmouseup = () => activeContexts[idx].isDrawing = false;
+        canvas.onmouseleave = () => activeContexts[idx].isDrawing = false;
+
+        canvas.ontouchstart = (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            activeContexts[idx].isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        };
+        canvas.ontouchmove = (e) => {
+            e.preventDefault();
+            if (!activeContexts[idx].isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            ctx.stroke();
+        };
+        canvas.ontouchend = () => activeContexts[idx].isDrawing = false;
+    }
+
+    function clearSig(idx) {
+        const canvas = document.getElementById(`canvas_${idx}`);
+        if (activeContexts[idx]) {
+            const { ctx } = activeContexts[idx];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    function saveAndRecordSession() {
+        const selectSec = document.getElementById('liveSector');
+        if(!selectSec) return;
+        const sectorVal = selectSec.value;
+        const sectorObj = sectorsMaster.find(s => s.id == sectorVal);
+        const assignedInstructor = getInstructorForSector(sectorVal);
+        const key = `${todayStr}_Sub_${sectorVal}`;
+
+        // Collect Journal Feeder Data
+        const journalData = {
+            topic: document.getElementById('jnlTopic').value || 'Materi Harian Standar',
+            method: document.getElementById('jnlMethod').value || 'Tatap Muka & Praktik',
+            obstacle: document.getElementById('jnlObstacle').value || 'NIHIL',
+            evaluation: document.getElementById('jnlEvaluation').value || 'Target 8 JPL tercapai dengan baik'
+        };
+
+        let studentLogs = {};
+        students.forEach((name, idx) => {
+            const chk = document.getElementById(`chk_${idx}`);
+            const isPresent = chk ? chk.checked : true;
+            const canvas = document.getElementById(`canvas_${idx}`);
+            
+            let sigData = "";
+            if(canvas && activeContexts[idx]) {
+                sigData = canvas.toDataURL();
+            }
+
+            studentLogs[idx] = {
+                name: name,
+                present: isPresent,
+                sig: sigData
+            };
+        });
+
+        recordedSessions[key] = {
+            date: todayStr,
+            sectorInfo: `${sectorObj.name} (8 JPL)`,
+            instructor: assignedInstructor,
+            journal: journalData,
+            students: studentLogs
+        };
+
+        localStorage.setItem('bp3mi_attendance_logs_v13', JSON.stringify(recordedSessions));
+
+        const msgSpan = document.getElementById('liveMsg');
+        if(msgSpan) msgSpan.innerText = "✅ Jurnal & Presensi Tersimpan Permanent (8 JPL Dipotong)!";
+        setTimeout(() => { 
+            if(msgSpan) msgSpan.innerText = ""; 
+            buildLiveRoster();
+        }, 1500);
+    }
+
+    function renderReportData(tableBodyId, journalContainerId) {
+        const tbody = document.getElementById(tableBodyId);
+        const jnlContainer = document.getElementById(journalContainerId);
+        if(!tbody || !jnlContainer) return;
+        
+        tbody.innerHTML = "";
+        jnlContainer.innerHTML = "<h4>📖 Arsip Teaching-Learning Journal (Log Pengajaran Trainer)</h4>";
+
+        const keys = Object.keys(recordedSessions).sort().reverse();
+
+        if(keys.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: #64748b;">Belum ada data sesi harian tersimpan.</td></tr>`;
+            jnlContainer.innerHTML += `<p style="font-size:0.85rem; color:#64748b; font-style:italic;">Belum ada jurnal pengajaran tercatat.</p>`;
+            return;
+        }
+
+        keys.forEach(key => {
+            const session = recordedSessions[key];
+            
+            // Render Journal Card
+            if(session.journal) {
+                jnlContainer.innerHTML += `
+                    <div class="print-journal-card">
+                        <strong>📅 Tanggal:</strong> ${session.date} | <strong>Modul:</strong> ${session.sectorInfo} | <strong>Instruktur:</strong> ${session.instructor}
+                        <br><strong>• Topik/Materi:</strong> ${session.journal.topic}
+                        <br><strong>• Metode:</strong> ${session.journal.method}
+                        <br><strong>• Kendala:</strong> ${session.journal.obstacle} | <strong>Evaluasi:</strong> ${session.journal.evaluation}
+                    </div>
+                `;
+            }
+
+            // Render Attendance Roster Rows
+            const sessionLogs = session.students || {};
+            Object.keys(sessionLogs).forEach(idx => {
+                const log = sessionLogs[idx];
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600; font-size:0.8rem;">${session.date}<br><span style="color:var(--primary-color);">${session.sectorInfo} [${session.instructor}]</span></td>
+                        <td><strong>${log.name}</strong></td>
+                        <td class="checkbox-center">${log.present ? '<span style="color:#166534; font-weight:bold;">Hadir (✔)</span>' : '<span style="color:#dc2626;">Tidak Hadir</span>'}</td>
+                        <td style="text-align:center;">
+                            ${log.sig ? `<img src="${log.sig}" style="max-height:45px; display:block; margin:0 auto;">` : '<span style="color:#94a3b8; font-style:italic;">[ Kosong ]</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+    }
+
+    function resetSystemCache() {
+        if(confirm("Apakah Anda ingin mereset cache log presensi & jurnal trainer?")) {
+            for(let i = 1; i <= 13; i++) {
+                localStorage.removeItem(`bp3mi_attendance_logs_v${i}`);
+            }
+            recordedSessions = {};
+            buildLiveRoster();
+            alert("Sistem berhasil disegarkan!");
+        }
+    }
+
+    window.onload = function() {
+        buildLiveRoster();
+    };
+</script>
+
+</body>
+</html>
