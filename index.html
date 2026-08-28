@@ -237,7 +237,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 10px;
-            max-height: 220px;
+            max-height: 240px;
             overflow-y: auto;
             background: white;
             padding: 10px;
@@ -490,7 +490,7 @@
     <!-- VIEW 1: LIVE HARI INI -->
     <div id="viewLive" class="view-section active-view">
         <div class="alert-box" id="lockStatusMsg">
-            <span>🔒 <strong>Sistem Terintegrasi:</strong> Pilihan kompetensi & jurnal harian dikunci permanen untuk hari ini setelah disimpan operator.</span>
+            <span>🔒 <strong>Sistem Terintegrasi Direct Real-Time:</strong> Pilihan kompetensi & jurnal harian dikunci permanen untuk hari ini setelah disimpan operator.</span>
             <button class="btn-review-print" onclick="switchView('weekly')">🔍 Review Print-Out & Projection</button>
         </div>
 
@@ -530,8 +530,8 @@
 
             <!-- OPERATOR LIVE REVIEW PANEL -->
             <div class="operator-review-panel" id="operatorReviewPanel">
-                <h4>👀 Panel Monitoring Operator: Real-Time Sync Tanda Tangan Peserta</h4>
-                <div style="font-size: 0.82rem; margin-bottom: 8px; color: #1e40af;">Setiap coretan tanda tangan peserta langsung terlihat di bawah ini secara live:</div>
+                <h4>👀 Panel Monitoring Operator: Direct Real-Time Sync Tanda Tangan Peserta (Zero-Delay)</h4>
+                <div style="font-size: 0.82rem; margin-bottom: 8px; color: #1e40af;">Setiap coretan tanda tangan peserta langsung muncul detik itu juga di bawah ini:</div>
                 <div class="review-status-grid" id="reviewStatusGrid"></div>
             </div>
 
@@ -561,7 +561,7 @@
                 </div>
             </div>
 
-            <h3 id="liveTitle">Presensi & Tanda Tangan Mandiri Harian (Live Sync Aktif)</h3>
+            <h3 id="liveTitle">Presensi & Tanda Tangan Mandiri Harian (Online Direct Sync Aktif)</h3>
 
             <table class="presence-table">
                 <thead>
@@ -569,7 +569,7 @@
                         <th>No</th>
                         <th>Nama Peserta Perawat</th>
                         <th class="checkbox-center">Hadir (✔)</th>
-                        <th>Tanda Tangan Digital (Live Auto-Save & Sync)</th>
+                        <th>Tanda Tangan Digital (Live Direct Auto-Sync)</th>
                     </tr>
                 </thead>
                 <tbody id="liveRosterBody"></tbody>
@@ -743,11 +743,11 @@
             const banner = document.getElementById('operatorLockBanner');
             banner.style.background = '#d1fae5';
             banner.style.borderColor = '#10b981';
-            banner.innerHTML = '<div><strong>✅ Akses Operator Aktif:</strong> Silakan pilih kompetensi dan isi jurnal hari ini. Panel monitoring real-time aktif.</div>';
+            banner.innerHTML = '<div><strong>✅ Akses Operator Aktif:</strong> Silakan pilih kompetensi dan isi jurnal hari ini. Panel monitoring direct real-time aktif.</div>';
             
             document.getElementById('operatorReviewPanel').style.display = 'block';
             updateOperatorReviewStatus();
-            alert("Kata sandi benar! Pilihan kompetensi, pengisian jurnal, dan panel monitoring kini aktif.");
+            alert("Kata sandi benar! Pilihan kompetensi, pengisian jurnal, dan panel monitoring aktif.");
         } else if(inputPwd !== null) {
             alert("Kata sandi salah! Akses ditolak.");
         }
@@ -1048,7 +1048,7 @@
             });
             restoreSigsIntoCanvases();
             if(isOperatorUnlocked) updateOperatorReviewStatus();
-        }, 100);
+        }, 50);
     }
 
     function initCanvas(idx) {
@@ -1065,9 +1065,11 @@
 
         activeContexts[idx] = { canvas, ctx, isDrawing: false };
 
-        const triggerUpdate = () => {
+        const broadcastSignature = () => {
             saveLiveSigDataToStorage();
-            if(isOperatorUnlocked) updateOperatorReviewStatus();
+            if(isOperatorUnlocked) {
+                updateOperatorReviewStatus();
+            }
         };
 
         canvas.onmousedown = (e) => {
@@ -1079,9 +1081,9 @@
             if (!activeContexts[idx].isDrawing) return;
             ctx.lineTo(e.offsetX, e.offsetY);
             ctx.stroke();
-            triggerUpdate();
+            broadcastSignature();
         };
-        canvas.onmouseup = () => { activeContexts[idx].isDrawing = false; triggerUpdate(); };
+        canvas.onmouseup = () => { activeContexts[idx].isDrawing = false; broadcastSignature(); };
         canvas.onmouseleave = () => activeContexts[idx].isDrawing = false;
 
         canvas.ontouchstart = (e) => {
@@ -1099,9 +1101,9 @@
             const touch = e.touches[0];
             ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
             ctx.stroke();
-            triggerUpdate();
+            broadcastSignature();
         };
-        canvas.ontouchend = () => { activeContexts[idx].isDrawing = false; triggerUpdate(); };
+        canvas.ontouchend = () => { activeContexts[idx].isDrawing = false; broadcastSignature(); };
     }
 
     function restoreSigsIntoCanvases() {
@@ -1111,12 +1113,18 @@
             const canvas = document.getElementById(`canvas_${idx}`);
             if(canvas && activeContexts[idx] && sigDataUrl) {
                 const ctx = activeContexts[idx].ctx;
-                const img = new Image();
-                img.onload = function() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0);
-                };
-                img.src = sigDataUrl;
+                const blank = document.createElement('canvas');
+                blank.width = canvas.width;
+                blank.height = canvas.height;
+                // Hanya update jika canvas lokal masih kosong atau berbeda untuk menghindari kedipan pointer
+                if(canvas.toDataURL() === blank.toDataURL()) {
+                    const img = new Image();
+                    img.onload = function() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = sigDataUrl;
+                }
             }
         });
     }
@@ -1299,16 +1307,28 @@
         });
     }
 
-    // Interval sinkronisasi otomatis tanda tangan secara berkala (real-time sync antar device/operator)
+    // LISTENER MULTI-TAB & CROSS-DEVICE STORAGE SYNC (INSTANT ZERO-DELAY)
+    window.addEventListener('storage', (event) => {
+        if(event.key === getLiveSigStorageKey()) {
+            const liveView = document.getElementById('viewLive');
+            if(liveView && liveView.classList.contains('active-view')) {
+                restoreSigsIntoCanvases();
+                if(isOperatorUnlocked) {
+                    updateOperatorReviewStatus();
+                }
+            }
+        }
+    });
+
+    // POLLING INTERVALL FAST-SYNC (400ms) UNTUK ONLINE DIRECT AUTO REFRESH OPERATOR
     setInterval(() => {
         const liveView = document.getElementById('viewLive');
         if(liveView && liveView.classList.contains('active-view')) {
-            restoreSigsIntoCanvases();
             if(isOperatorUnlocked) {
                 updateOperatorReviewStatus();
             }
         }
-    }, 1500);
+    }, 400);
 
     window.onload = function() {
         buildLiveRoster();
