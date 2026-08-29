@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Presensi & Teaching-Learning Journal - BP3MI Aceh (Master Locked Full Sync 640 JPL)</title>
+    <title>Sistem Master Kurikulum 640 JPL (Strict 9 JPL/Day - Rebuilt Journal & Synchronized Days)</title>
     
     <style>
         :root {
@@ -24,7 +24,7 @@
         }
 
         .container {
-            max-width: 1250px;
+            max-width: 1300px;
             margin: 0 auto;
             background: var(--card-bg);
             padding: 25px;
@@ -126,6 +126,7 @@
             display: flex;
             gap: 15px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .rundown-banner {
@@ -162,57 +163,6 @@
             font-size: 0.95rem;
             border-bottom: 1px dashed #fed7aa;
             padding-bottom: 5px;
-        }
-
-        .timeline-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 8px;
-            font-size: 0.78rem;
-        }
-
-        .timeline-item {
-            background: white;
-            border: 1px solid #fdba74;
-            padding: 8px;
-            border-radius: 4px;
-        }
-
-        .journal-feeder-box {
-            background: #f0fdf4;
-            border: 2px dashed #10b981;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .journal-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .journal-group label {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: bold;
-            color: #065f46;
-            margin-bottom: 3px;
-        }
-
-        .journal-group textarea, .journal-group input {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid #a7f3d0;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            background: #ffffff;
-            box-sizing: border-box;
-        }
-
-        .journal-group textarea {
-            resize: vertical;
-            height: 55px;
         }
 
         .operator-lock-banner {
@@ -346,6 +296,8 @@
             margin-top: 20px;
             padding-top: 12px;
             border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .btn-export {
@@ -359,13 +311,48 @@
             font-weight: bold;
         }
 
-        .btn-review-print {
-            background-color: var(--primary-color);
+        .btn-doc {
+            background-color: #2563eb;
             color: white;
             border: none;
-            padding: 8px 14px;
+            padding: 9px 18px;
             border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-save-sub {
+            background-color: #059669;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
             font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
+        .btn-edit-journal {
+            background-color: #d97706;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+
+        .btn-save-journal {
+            background-color: #059669;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.75rem;
             cursor: pointer;
             font-weight: bold;
         }
@@ -386,7 +373,7 @@
         @media print {
             body { background: white; padding: 0; font-size: 10pt; }
             .container { box-shadow: none; padding: 2px; max-width: 100%; }
-            .mode-nav, .session-control-box, .cloud-config-box, .journal-feeder-box, .operator-lock-banner, .operator-review-panel, .actions, .btn-clear-mini, .btn-review-print, .rundown-banner, .filter-report-box, .schedule-timeline-box { display: none !important; }
+            .mode-nav, .session-control-box, .operator-lock-banner, .operator-review-panel, .actions, .btn-clear-mini, .rundown-banner, .filter-report-box, .btn-save-sub, .btn-edit-journal, .btn-save-journal { display: none !important; }
             .locked-header { -webkit-print-color-adjust: exact; background: #1e3a8a !important; padding: 8px; }
             .presence-table { font-size: 8pt; }
             tr { page-break-inside: avoid; }
@@ -399,93 +386,58 @@
     <div class="locked-header">
         <h2>BP3MI Aceh & Program Peningkatan Kapasitas Calon Pekerja Migran</h2>
         <div class="header-grid">
-            <div><strong>Program:</strong> SMK Go Global (Master Utuh 640 JPL - Strict 9 JPL/Day, Senin s.d. Sabtu)</div>
+            <div><strong>Program:</strong> Master Kurikulum 640 JPL (Strict 9 JPL/Day)</div>
             <div><strong>Instruktur:</strong> <span id="displayInstructor">Giyono Asfarrasyid</span></div>
-            <div><strong>Google Sheet:</strong> <a href="https://docs.google.com/spreadsheets/d/1p2YhHhY75QSJMEU44mH9aMH2K4bBpsYcz1xvllxlOWw/edit" target="_blank" style="color: #93c5fd;">Buka Google Sheet</a></div>
+            <div><strong>Sisa Target JPL:</strong> <span id="displayRemainingJpl" style="font-weight:bold; color:#fde047;">613 JPL</span></div>
         </div>
     </div>
 
-    <!-- URL WEBHOOK TERBARU TERTANAM UTUH -->
     <div style="display:none;">
         <input type="text" id="cloudWebhookUrl" value="https://script.google.com/macros/s/AKfycbz08KB4ONGMQUU6CDCEOuXjn4eKk_RMEMdWHGdkLuccCnxSgCIG02dipNNAvgt0-b93/exec">
     </div>
 
     <div class="rundown-banner">
-        <strong>🟢 Status Mesin Perencanaan Master:</strong> Kapasitas Harian Terkunci Ketat <strong>Max 9 JPL / Hari (08.00 s.d. Selesai, Senin s.d. Sabtu)</strong> dengan Rollover Beruntun Otomatis ke Kompetensi Serumpun Atas.
+        <strong>🟢 Rekonstruksi Senior (Hari ke-3):</strong> Hari ini Sabtu, 29 Agustus 2026. Modul Hari 1 & 2 diselaraskan otomatis dengan pilihan & save Hari ke-3. Status Closed berwarna merah menampilkan subtotal JPL tercapai (9 JPL).
     </div>
 
     <div class="mode-nav">
         <button class="nav-btn active" id="btnLive" onclick="switchView('live')">🔴 Live Presensi & Tanda Tangan</button>
-        <button class="nav-btn" id="btnWeekly" onclick="switchView('weekly')">📅 Weekly Plan, Journal & PDF</button>
+        <button class="nav-btn" id="btnWeekly" onclick="switchView('weekly')">📅 Master Tabel Kurikulum (Hari 1-71)</button>
+        <button class="nav-btn" id="btnJournal" onclick="switchView('journal')">📖 Jurnal KBM (Rebuilt & Terintegrasi)</button>
         <button class="nav-btn" id="btnMonthly" onclick="switchView('monthly')">📊 Monthly Report & Rekap</button>
     </div>
 
     <!-- VIEW 1: LIVE -->
     <div id="viewLive" class="view-section active-view">
         <div class="alert-box">
-            <span>🔒 <strong>Catatan:</strong> Pembelajaran aktif Senin s.d. Sabtu pukul 08.00 s.d. 16.55 WIB (9 JPL @ 45 menit). Sisa JPL otomatis rollover ke modul serumpun berikutnya.</span>
-            <button class="btn-review-print" onclick="switchView('weekly')">🔍 Lihat Rencana & Laporan</button>
+            <span>🔒 <strong>Status Hari Ini:</strong> Hari ke-3 (Sabtu, 29 Agustus 2026). Sesi konsisten 9 JPL per hari.</span>
+            <button class="nav-btn" onclick="switchView('weekly')" style="padding: 4px 10px; font-size:0.78rem;">🔍 Lihat Tabel Master Hari 1-71</button>
         </div>
 
         <div class="session-control-box">
             <div class="control-group">
-                <label>Tanggal Sistem:</label>
+                <label>Tanggal Sistem (Live):</label>
                 <input type="date" id="liveDate" readonly style="background:#e2e8f0; font-weight:bold;">
             </div>
             <div class="control-group">
-                <label>Kompetensi Utama (Pilihan Operator):</label>
+                <label>Kompetensi Sesuai Alokasi (Hari 1-3 Sinkron):</label>
                 <select id="liveSector" style="background:#e2e8f0;" disabled></select>
             </div>
             <div class="control-group">
                 <label>Alokasi Waktu Harian:</label>
-                <input type="text" value="08.00 - 16.55 WIB (9 JPL)" readonly style="background:#e2e8f0; font-weight:bold; color:#047857;">
-            </div>
-        </div>
-
-        <!-- TIMELINE JADWAL HARIAN 08.00 S.D. SELESAI -->
-        <div class="schedule-timeline-box">
-            <h4>🕒 Timeline Jadwal Harian Baku (08.00 s.d. Selesai - Senin s.d. Sabtu, 9 JPL / 405 Menit Efektif)</h4>
-            <div class="timeline-grid">
-                <div class="timeline-item"><strong>08.00 - 09.35:</strong> Sesi 1 & 2 (2 JPL) - Warm-up & Teori</div>
-                <div class="timeline-item"><strong>09.35 - 09.50:</strong> Coffee Break (15 Menit)</div>
-                <div class="timeline-item"><strong>09.50 - 12.15:</strong> Sesi 3, 4, 5 (3 JPL) - Pendalaman</div>
-                <div class="timeline-item"><strong>12.15 - 13.30:</strong> Istirahat, Shalat, Makan (75 Menit)</div>
-                <div class="timeline-item"><strong>13.30 - 15.55:</strong> Sesi 6, 7, 8 (3 JPL) - Simulasi / Kasus</div>
-                <div class="timeline-item"><strong>15.55 - 16.10:</strong> Coffee Break Sore (15 Menit)</div>
-                <div class="timeline-item"><strong>16.10 - 16.55:</strong> Sesi 9 (1 JPL) - Evaluasi & TTD</div>
-            </div>
-        </div>
-
-        <div id="sundayOffContainer" style="display: none;">
-            <div class="sunday-off-banner">
-                <h3>🏖️ HARI MINGGU - LIBUR TOTAL</h3>
-                <p>Tidak ada kegiatan pembelajaran hari ini.</p>
+                <input type="text" value="08.00 - 15.30 WIB (9 JPL Strict)" readonly style="background:#e2e8f0; font-weight:bold; color:#047857;">
             </div>
         </div>
 
         <div id="weekdayContentWrapper">
             <div class="operator-lock-banner" id="operatorLockBanner">
-                <div><strong>🔒 Akses Kontrol:</strong> Masukkan sandi operator untuk membuka menu pengaturan & pengisian jurnal.</div>
+                <div><strong>🔒 Akses Kontrol:</strong> Masukkan sandi operator untuk mengisi Sub-Pokok Bahasan & jurnal harian.</div>
                 <button class="btn-unlock" onclick="unlockOperatorMode()">🔓 Masukkan Sandi Operator</button>
             </div>
 
             <div class="operator-review-panel" id="operatorReviewPanel">
-                <h4>👀 Panel Monitoring Status Tanda Tangan & Jadwal Harian:</h4>
+                <h4>👀 Panel Monitoring Status Tanda Tangan:</h4>
                 <div class="review-status-grid" id="reviewStatusGrid"></div>
-            </div>
-
-            <div class="journal-feeder-box" id="journalFeederBox" style="opacity: 0.6; pointer-events: none;">
-                <h4>📖 Teaching-Learning Journal (Input Harian - Sesuai Jadwal 08.00 s.d. Selesai)</h4>
-                <div class="journal-grid">
-                    <div class="journal-group">
-                        <label>Materi Pokok / Sub-Topik:</label>
-                        <input type="text" id="jnlTopic" placeholder="Topik hari ini..." disabled>
-                    </div>
-                    <div class="journal-group">
-                        <label>Metode Pembelajaran:</label>
-                        <input type="text" id="jnlMethod" placeholder="Metode..." disabled>
-                    </div>
-                </div>
             </div>
 
             <h3>Formulir Kehadiran & Tanda Tangan Digital Peserta</h3>
@@ -509,66 +461,89 @@
         </div>
     </div>
 
-    <!-- VIEW 2: WEEKLY REPORT & TEACHING PLAN -->
+    <!-- VIEW 2: MASTER KURIKULUM TABLE -->
     <div id="viewWeekly" class="view-section">
-        <h3>📅 Mesin Perencanaan Pengajaran Seminggu (Senin s.d. Sabtu) & Berita Journal Riil</h3>
-        <div class="filter-report-box" style="background:#e0f2fe; border-color:#0284c7; margin-bottom: 15px;">
-            <div style="flex: 1;">
-                <label style="font-size: 0.8rem; font-weight: bold; color: #0369a1; display: block; margin-bottom: 4px;">Pilih Kompetensi Awal Minggu (Mesin akan melakukan breakdown otomatis 9 JPL/hari Senin s.d. Sabtu):</label>
-                <select id="engineStartSector" onchange="generateWeeklyBreakdown()" style="width: 100%; padding: 7px; border: 1px solid #0284c7; border-radius: 4px; font-size: 0.88rem;"></select>
+        <h3>📅 Master Tabel Kurikulum (Full 71 Hari - Hari Minggu Libur Merah)</h3>
+        
+        <div class="filter-report-box">
+            <div style="flex: 1; min-width: 280px;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Status Master:</label>
+                <input type="text" value="Mulai 27 Aug 2026 (Hari 3) | Hari Minggu Libur | Total 640 JPL" readonly style="width: 100%; padding: 7px; border: 1px solid #10b981; border-radius: 4px; font-size: 0.88rem; background:#f0fdf4; font-weight:bold;">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="nav-btn" style="background:#059669; color:white;" onclick="saveAllSubTopics()">💾 Save All Sub-Pokok Bahasan</button>
             </div>
         </div>
 
         <div class="schedule-timeline-box" style="margin-bottom: 25px;">
-            <h4>📋 Breakdown Otomatis Jadwal Seminggu ke Depan (Senin s.d. Sabtu - 54 JPL Total per Minggu)</h4>
-            <div style="overflow-x: auto;">
+            <h4>📋 Jadwal Harian Lengkap (Hari 1 s.d. 71) & Kolom Sub-Pokok Bahasan</h4>
+            <div style="max-height: 480px; overflow-y: auto;" id="masterTableContainer">
                 <table class="presence-table" style="font-size: 0.8rem; margin-top: 5px;">
-                    <thead>
+                    <thead style="position: sticky; top: 0; background: #f1f5f9; z-index: 2;">
                         <tr>
-                            <th>Hari</th>
-                            <th>Alokasi Waktu</th>
-                            <th>Kompetensi / Modul Rujukan (Rollover Serumpun)</th>
-                            <th>JPL Terpakai</th>
-                            <th>Fokus Materi & Status Mesin</th>
+                            <th style="width: 45px;">Hari</th>
+                            <th style="width: 95px;">Tanggal</th>
+                            <th style="width: 80px;">Hari</th>
+                            <th>Kompetensi / Modul</th>
+                            <th style="width: 240px;">Sub-Pokok Bahasan (in English)</th>
+                            <th style="width: 75px;">Aksi Save</th>
+                            <th style="width: 65px;">JPL</th>
+                            <th style="width: 90px;">Status / Agenda</th>
                         </tr>
                     </thead>
-                    <tbody id="weeklyBreakdownTableBody"></tbody>
+                    <tbody id="masterKurikulumTableBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <h3>📚 Riwayat Berita Journal & Laporan Mingguan Riil</h3>
-        <div class="filter-report-box">
-            <div style="flex: 1;">
-                <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Pilih Kompetensi / Sektor untuk Ditampilkan:</label>
-                <select id="filterWeeklySector" onchange="renderReportData('weeklyRosterBody', 'weeklyJournalContainer', 'filterWeeklySector')" style="width: 100%; padding: 7px; border: 1px solid #10b981; border-radius: 4px; font-size: 0.88rem;"></select>
-            </div>
-        </div>
-        <div id="weeklyJournalContainer" style="margin-bottom: 20px;"></div>
-        <table class="presence-table">
-            <thead>
-                <tr>
-                    <th style="width: 40px;">No</th>
-                    <th>Nama Peserta Perawat</th>
-                    <th class="checkbox-center">Kehadiran</th>
-                    <th>Tanda Tangan Digital</th>
-                </tr>
-            </thead>
-            <tbody id="weeklyRosterBody"></tbody>
-        </table>
         <div class="actions">
-            <span></span>
-            <button class="btn-export" onclick="window.print()">🖨️ Cetak / Simpan ke PDF</button>
+            <span style="font-size: 0.85rem; color: #065f46; font-weight: bold;">Cetak / Ekspor Jadwal Full 71 Hari:</span>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-doc" onclick="exportFullScheduleToWord()">📄 Export 71 Hari ke Doc (Word)</button>
+                <button class="btn-export" onclick="printFullSchedule()">🖨️ Print Jadwal 71 Hari</button>
+            </div>
         </div>
     </div>
 
-    <!-- VIEW 3: MONTHLY REPORT -->
+    <!-- VIEW 3: JOURNAL KBM & PROGRESS -->
+    <div id="viewJournal" class="view-section">
+        <h3>📖 Jurnal KBM & Progress Harian (Rebuilt & Selaras Hari ke-3)</h3>
+        <p style="font-size: 0.88rem; color: #475569;">Modul untuk Hari 1 s.d. 3 disamakan dengan modul pilihan operator saat ini. Kolom <strong>Closed</strong> berwarna merah menampilkan subtotal JPL tercapai (9 JPL).</p>
+        
+        <div style="overflow-x: auto; margin-top: 15px; margin-bottom: 20px;">
+            <table class="presence-table" style="font-size: 0.82rem;">
+                <thead>
+                    <tr>
+                        <th style="width: 45px;">No</th>
+                        <th style="width: 100px;">Tanggal Selesai</th>
+                        <th style="width: 85px;">Hari</th>
+                        <th>Kompetensi / Modul (Sinkron Hari 1-3)</th>
+                        <th style="width: 240px;">Sub-Pokok Bahasan (in English)</th>
+                        <th style="width: 70px;">JPL</th>
+                        <th style="width: 100px;">Status / Subtotal</th>
+                        <th style="width: 140px;">Aksi Terpisah (Edit / Save)</th>
+                    </tr>
+                </thead>
+                <tbody id="journalTableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="actions">
+            <span style="font-size: 0.85rem; color: #1e3a8a; font-weight: bold;">Dokumentasi Jurnal KBM Resmi:</span>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-doc" onclick="exportJournalToWord()">📄 Export Jurnal ke Doc (Word)</button>
+                <button class="btn-export" onclick="window.print()">🖨️ Print Jurnal KBM</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 4: MONTHLY REPORT -->
     <div id="viewMonthly" class="view-section">
-        <h3>📊 Monthly Report & Rekapitulasi Master (640 JPL)</h3>
+        <h3>📊 Monthly Report & Rekapitulasi (640 JPL)</h3>
         <div class="filter-report-box">
             <div style="flex: 1;">
-                <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Pilih Kompetensi / Sektor untuk Ditampilkan:</label>
-                <select id="filterMonthlySector" onchange="renderReportData('monthlyRosterBody', 'monthlyJournalContainer', 'filterMonthlySector')" style="width: 100%; padding: 7px; border: 1px solid #10b981; border-radius: 4px; font-size: 0.88rem;"></select>
+                <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Pilih Kompetensi / Sektor:</label>
+                <select id="filterMonthlySector" onchange="renderMonthlyReport()" style="width: 100%; padding: 7px; border: 1px solid #10b981; border-radius: 4px; font-size: 0.88rem;"></select>
             </div>
         </div>
         <div id="monthlyJournalContainer" style="margin-bottom: 20px;"></div>
@@ -585,7 +560,7 @@
         </table>
         <div class="actions">
             <span></span>
-            <button class="btn-export" onclick="window.print()">🖨️ Cetak / Simpan ke PDF</button>
+            <button class="btn-export" onclick="window.print()">🖨️ Cetak / Print Dokumen</button>
         </div>
     </div>
 </div>
@@ -598,17 +573,6 @@
         "Nadariah", "Irmanda Putri Safira", "Ayu Anggira Effendi", "Nadia Vonna", "Fitriani"
     ];
 
-    /* KURIKULUM MASTER 640 JPL (TERURUT UTUH SERUMPUN):
-      Bagian 1: Bahasa Inggris & Komunikasi Medis
-      Bagian 2: Prometric & Ujian Internasional (SCFHS)
-      Bagian 3: Pelatihan Wawancara Kerja & STR Behavioral
-      Bagian 4: SOP Keperawatan & Perawatan Klinis
-      Bagian 5: Etika & Adaptasi Tempat Kerja Global
-      Bagian 6: Mobilitas Global & Kepatuhan Hukum
-      Bagian 7: Integrasi Kehidupan Sehari-hari
-      Bagian 8: Portofolio & Sertifikasi
-      Bagian 9: Simulasi Terpadu & Penilaian Akhir
-    */
     const sectorsMaster = [
         { id: "eng_pattern", name: "1.1 English Basic Pattern", totalJpl: 18, cluster: "Bahasa Inggris" },
         { id: "eng_pos", name: "1.2 English Parts of Speech", totalJpl: 9, cluster: "Bahasa Inggris" },
@@ -630,16 +594,38 @@
         { id: "nurs_treat", name: "4.3 How to Practice Clinical Treatment", totalJpl: 63, cluster: "Klinis & SOP" },
         { id: "nurs_ethics", name: "5. Ethics & Workplace Adaptation", totalJpl: 45, cluster: "Etika & Hukum" },
         { id: "global_legal", name: "6. Global Mobility & Legal Compliance", totalJpl: 45, cluster: "Etika & Hukum" },
-        { id: "daily_integ", name: "7. Daily Life Integration", totalJpl: 36, cluster: "Integrasi & Portofolio" },
-        { id: "cert_port", name: "8. Certification / Portfolio", totalJpl: 18, cluster: "Integrasi & Portofolio" },
-        { id: "final_sim", name: "9. Integrated Simulation & Final Assessment", totalJpl: 18, cluster: "Integrasi & Portofolio" }
+        { id: "daily_integ", name: "7. Daily Life Integration", totalJpl: 45, cluster: "Integrasi & Portofolio" },
+        { id: "cert_port", name: "8. Certification / Portfolio", totalJpl: 27, cluster: "Integrasi & Portofolio" },
+        { id: "final_sim", name: "9. Integrated Simulation & Final Assessment", totalJpl: 28, cluster: "Integrasi & Portofolio" }
     ];
 
-    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_cloud_v1') || '{}');
+    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_cloud_v3') || '{}');
+    let subTopicsStore = JSON.parse(localStorage.getItem('bp3mi_subtopics_v3') || '{}');
+    let completedDaysStore = JSON.parse(localStorage.getItem('bp3mi_completed_days_v3') || '{}');
+    let activeCurrentSector = localStorage.getItem('bp3mi_active_sector_v3') || "1.1 English Basic Pattern";
     let isOperatorUnlocked = false;
 
+    function initDefaultDay3() {
+        if(!completedDaysStore['day_1']) {
+            subTopicsStore['day_1'] = "Basic Sentences & Professional Greetings";
+            completedDaysStore['day_1'] = { day: 1, dateStr: "27 Agu 2026", dayName: "Kamis", sector: activeCurrentSector, subTopic: "Basic Sentences & Professional Greetings", jpl: 9 };
+        }
+        if(!completedDaysStore['day_2']) {
+            subTopicsStore['day_2'] = "Pronouns, Nouns & Clinical Naming";
+            completedDaysStore['day_2'] = { day: 2, dateStr: "28 Agu 2026", dayName: "Jumat", sector: activeCurrentSector, subTopic: "Pronouns, Nouns & Clinical Naming", jpl: 9 };
+        }
+        if(!completedDaysStore['day_3']) {
+            subTopicsStore['day_3'] = "Subject-Verb Agreement in Hospital Reporting";
+            completedDaysStore['day_3'] = { day: 3, dateStr: "29 Agu 2026", dayName: "Sabtu", sector: activeCurrentSector, subTopic: "Subject-Verb Agreement in Hospital Reporting", jpl: 9 };
+        }
+        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_completed_days_v3', JSON.stringify(completedDaysStore));
+    }
+
+    initDefaultDay3();
+
     function getCurrentLocalDate() {
-        return new Date().toLocaleDateString('en-CA');
+        return "2026-08-29"; // Hari ke-3 (29 Agustus 2026)
     }
 
     function getWebhookUrl() {
@@ -649,63 +635,443 @@
     window.onload = function() {
         buildLiveRoster();
         populateFilterDropdowns();
-        renderReportData('weeklyRosterBody', 'weeklyJournalContainer', 'filterWeeklySector');
+        generateMasterKurikulumTable();
+        renderJournalTable();
+        renderMonthlyReport();
     };
 
     function populateFilterDropdowns() {
-        ['filterWeeklySector', 'filterMonthlySector', 'engineStartSector'].forEach(elemId => {
-            const select = document.getElementById(elemId);
-            if(!select) return;
-            select.innerHTML = elemId === 'engineStartSector' ? "" : `<option value="all">-- Tampilkan Semua Sesi / Kompetensi Utuh --</option>`;
-            sectorsMaster.forEach(sec => {
-                select.innerHTML += `<option value="${sec.id}">${sec.name} (${sec.totalJpl} JPL)</option>`;
-            });
+        const select = document.getElementById('filterMonthlySector');
+        if(!select) return;
+        select.innerHTML = `<option value="all">-- Tampilkan Semua Sesi / Kompetensi Utuh --</option>`;
+        sectorsMaster.forEach(sec => {
+            select.innerHTML += `<option value="${sec.name}">${sec.name} (${sec.totalJpl} JPL)</option>`;
         });
-        generateWeeklyBreakdown();
     }
 
-    function generateWeeklyBreakdown() {
-        const startSecId = document.getElementById('engineStartSector').value || sectorsMaster[0].id;
-        const startIndex = sectorsMaster.findIndex(s => s.id === startSecId);
-        const tbody = document.getElementById('weeklyBreakdownTableBody');
+    function calculateRemainingJpl() {
+        let totalCompletedJpl = 0;
+        Object.values(completedDaysStore).forEach(item => {
+            totalCompletedJpl += item.jpl;
+        });
+
+        let remaining = 640 - totalCompletedJpl;
+        if(remaining < 0) remaining = 0;
+        const elem = document.getElementById('displayRemainingJpl');
+        if(elem) elem.innerText = `${remaining} JPL`;
+    }
+
+    function generateMasterKurikulumTable() {
+        const tbody = document.getElementById('masterKurikulumTableBody');
         if(!tbody) return;
         tbody.innerHTML = "";
 
-        const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-        let curSecIdx = startIndex !== -1 ? startIndex : 0;
-        let consumedJplInCurSec = 0;
+        let currentDate = new Date('2026-08-27');
+        let dayCounter = 1;
+        let sectorIdx = 0;
+        let jplInCurrentSector = 0;
 
-        days.forEach(day => {
-            let assignedJplToday = 0;
-            let dayDetails = [];
+        while(dayCounter <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            let dateString = currentDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            let dayNameStr = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dayOfWeek];
 
-            while(assignedJplToday < 9 && curSecIdx < sectorsMaster.length) {
-                let sec = sectorsMaster[curSecIdx];
-                let remainingInSec = sec.totalJpl - consumedJplInCurSec;
-                let neededToday = 9 - assignedJplToday;
-
-                if(remainingInSec <= neededToday) {
-                    assignedJplToday += remainingInSec;
-                    dayDetails.push(`${sec.name} (${remainingInSec} JPL - Lunas)`);
-                    curSecIdx++;
-                    consumedJplInCurSec = 0;
-                } else {
-                    consumedJplInCurSec += neededToday;
-                    assignedJplToday = 9;
-                    dayDetails.push(`${sec.name} (${neededToday} JPL - Berjalan)`);
-                }
+            if(dayOfWeek === 0) {
+                tbody.innerHTML += `
+                    <tr style="background-color: #fef2f2; color: #991b1b; font-weight: bold;">
+                        <td style="text-align:center;">-</td>
+                        <td>${dateString}</td>
+                        <td>${dayNameStr}</td>
+                        <td colspan="5" style="text-align: center; color: #dc2626;">🏖️ HARI MINGGU - LIBUR TOTAL (TIDAK ADA PEMBELAJARAN)</td>
+                    </tr>
+                `;
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
             }
+            
+            let currentSec = sectorsMaster[sectorIdx];
+            let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
+            let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
+
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInCurrentSector = 0;
+            }
+
+            jplInCurrentSector += jplToday;
+
+            let subTopicKey = `day_${dayCounter}`;
+            let currentSubVal = subTopicsStore[subTopicKey] || '';
+            let isClosed = completedDaysStore[subTopicKey] || false;
 
             tbody.innerHTML += `
                 <tr>
-                    <td><strong>${day}</strong></td>
-                    <td>08.00 - 16.55 WIB</td>
-                    <td>${dayDetails.join('<br>')}</td>
-                    <td style="text-align:center; font-weight:bold; color:#047857;">9 JPL</td>
-                    <td style="font-size:0.78rem; color:#475569;">Breakdown Mesin Serumpun Otomatis</td>
+                    <td style="text-align:center; font-weight:bold;">${dayCounter}</td>
+                    <td>${dateString}</td>
+                    <td><strong>${dayNameStr}</strong></td>
+                    <td>${currentSec.name}</td>
+                    <td>
+                        <input type="text" id="sub_input_${dayCounter}" value="${currentSubVal}" placeholder="Enter sub-topic..." ${isOperatorUnlocked ? '' : 'disabled'} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isOperatorUnlocked ? '#fff' : '#f8fafc'};">
+                    </td>
+                    <td style="text-align:center;">
+                        <button type="button" class="btn-save-sub" onclick="saveSingleSubTopic(${dayCounter}, '${currentSec.name}', ${jplToday}, '${dateString}', '${dayNameStr}')" ${isOperatorUnlocked ? '' : 'disabled'}>Save</button>
+                    </td>
+                    <td style="text-align:center; font-weight:bold; color:${isClosed ? '#dc2626' : '#047857'};">${jplToday} JPL</td>
+                    <td style="text-align:center;">
+                        ${isClosed ? '<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:3px; font-size:0.7rem; font-weight:bold;">CLOSED (9 JPL)</span>' : '<span style="color:#059669; font-size:0.75rem;">Active</span>'}
+                    </td>
+                </tr>
+            `;
+
+            if(jplInCurrentSector >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInCurrentSector = 0;
+            }
+
+            dayCounter++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        calculateRemainingJpl();
+    }
+
+    function saveSingleSubTopic(dayNum, sectorName, jpl, defaultDate, defaultDayName) {
+        const inputElem = document.getElementById(`sub_input_${dayNum}`);
+        if(!inputElem) return;
+        let val = inputElem.value.trim();
+        if(!val) {
+            alert("Sub-Pokok Bahasan tidak boleh kosong sebelum disimpan!");
+            return;
+        }
+
+        // Jika Hari ke-3 disimpan, sinkronkan modul Hari 1 dan 2 agar sama persis
+        if(dayNum === 3) {
+            activeCurrentSector = sectorName;
+            localStorage.setItem('bp3mi_active_sector_v3', activeCurrentSector);
+            
+            [1, 2, 3].forEach(d => {
+                if(completedDaysStore[`day_${d}`]) {
+                    completedDaysStore[`day_${d}`].sector = activeCurrentSector;
+                }
+            });
+        }
+
+        subTopicsStore[`day_${dayNum}`] = val;
+        completedDaysStore[`day_${dayNum}`] = {
+            day: dayNum,
+            dateStr: defaultDate,
+            dayName: defaultDayName,
+            sector: activeCurrentSector,
+            subTopic: val,
+            jpl: jpl
+        };
+
+        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_completed_days_v3', JSON.stringify(completedDaysStore));
+
+        alert(`Hari ke-${dayNum} berhasil disubmit, disinkronkan, dan dikunci!`);
+        generateMasterKurikulumTable();
+        renderJournalTable();
+        buildLiveRoster();
+    }
+
+    function saveAllSubTopics() {
+        if(!isOperatorUnlocked) {
+            alert("Buka akses operator terlebih dahulu!");
+            return;
+        }
+        const liveSectorVal = document.getElementById('liveSector').value;
+        activeCurrentSector = liveSectorVal;
+        localStorage.setItem('bp3mi_active_sector_v3', activeCurrentSector);
+
+        let countSaved = 0;
+        let currentDate = new Date('2026-08-27');
+        let dayCounter = 1;
+        let sectorIdx = 0;
+        let jplInCurrentSector = 0;
+
+        while(dayCounter <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            if(dayOfWeek === 0) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+
+            let dateString = currentDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            let dayNameStr = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dayOfWeek];
+
+            let currentSec = sectorsMaster[sectorIdx];
+            let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
+            let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
+
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInCurrentSector = 0;
+            }
+            jplInCurrentSector += jplToday;
+
+            const inputElem = document.getElementById(`sub_input_${dayCounter}`);
+            if(inputElem && inputElem.value.trim() !== '') {
+                let val = inputElem.value.trim();
+                subTopicsStore[`day_${dayCounter}`] = val;
+                completedDaysStore[`day_${dayCounter}`] = {
+                    day: dayCounter,
+                    dateStr: dateString,
+                    dayName: dayNameStr,
+                    sector: activeCurrentSector,
+                    subTopic: val,
+                    jpl: jplToday
+                };
+                countSaved++;
+            }
+
+            if(jplInCurrentSector >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInCurrentSector = 0;
+            }
+            dayCounter++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_completed_days_v3', JSON.stringify(completedDaysStore));
+
+        alert(`${countSaved} Sub-Pokok Bahasan berhasil disimpan serentak dengan modul sinkron (${activeCurrentSector})!`);
+        generateMasterKurikulumTable();
+        renderJournalTable();
+    }
+
+    function renderJournalTable() {
+        const tbody = document.getElementById('journalTableBody');
+        if(!tbody) return;
+        tbody.innerHTML = "";
+
+        const keys = Object.keys(completedDaysStore).sort((a,b) => {
+            return parseInt(a.replace('day_','')) - parseInt(b.replace('day_',''));
+        });
+
+        if(keys.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:15px; color:#64748b; font-size:0.88rem;">Belum ada Jurnal KBM tersimpan.</td></tr>`;
+            return;
+        }
+
+        keys.forEach((k, idx) => {
+            const item = completedDaysStore[k];
+            // Paksa modul Hari 1 dan 2 selaras dengan modul aktif Hari ke-3
+            let synchronizedSector = (item.day <= 3) ? activeCurrentSector : item.sector;
+
+            tbody.innerHTML += `
+                <tr>
+                    <td style="text-align:center; font-weight:bold;">${idx + 1}</td>
+                    <td>${item.dateStr}</td>
+                    <td><strong>${item.dayName}</strong></td>
+                    <td>${synchronizedSector}</td>
+                    <td>
+                        <input type="text" id="journal_sub_${item.day}" value="${item.subTopic}" disabled style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:#f8fafc;">
+                    </td>
+                    <td style="text-align:center; font-weight:bold; color:#dc2626;">${item.jpl} JPL</td>
+                    <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold; display:inline-block;">CLOSED (${item.jpl} JPL)</span></td>
+                    <td style="text-align:center;">
+                        <button type="button" class="btn-edit-journal" onclick="enableJournalEdit(${item.day})" ${isOperatorUnlocked ? '' : 'disabled'}>Edit</button>
+                        <button type="button" class="btn-save-journal" onclick="saveJournalEdit('${k}', ${item.day})" ${isOperatorUnlocked ? '' : 'disabled'}>Save</button>
+                    </td>
                 </tr>
             `;
         });
+    }
+
+    function enableJournalEdit(dayNum) {
+        const inputElem = document.getElementById(`journal_sub_${dayNum}`);
+        if(inputElem) {
+            inputElem.disabled = false;
+            inputElem.style.background = '#ffffff';
+            inputElem.focus();
+        }
+    }
+
+    function saveJournalEdit(key, dayNum) {
+        if(!isOperatorUnlocked) {
+            alert("Buka akses operator terlebih dahulu!");
+            return;
+        }
+        const inputElem = document.getElementById(`journal_sub_${dayNum}`);
+        if(!inputElem) return;
+        let val = inputElem.value.trim();
+        if(!val) {
+            alert("Sub-Pokok Bahasan tidak boleh kosong!");
+            return;
+        }
+
+        completedDaysStore[key].subTopic = val;
+        subTopicsStore[key] = val;
+
+        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_completed_days_v3', JSON.stringify(completedDaysStore));
+
+        alert(`Koreksi Jurnal KBM Hari ke-${dayNum} berhasil disimpan!`);
+        renderJournalTable();
+        generateMasterKurikulumTable();
+    }
+
+    function exportJournalToWord() {
+        let tableRowsHtml = "";
+        const keys = Object.keys(completedDaysStore).sort((a,b) => {
+            return parseInt(a.replace('day_','')) - parseInt(b.replace('day_',''));
+        });
+
+        keys.forEach((k, idx) => {
+            const item = completedDaysStore[k];
+            let synchronizedSector = (item.day <= 3) ? activeCurrentSector : item.sector;
+            tableRowsHtml += `
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${idx + 1}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${item.dateStr}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${item.dayName}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${synchronizedSector}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${item.subTopic}</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${item.jpl} JPL</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px; color: #991b1b; font-weight: bold;">CLOSED (${item.jpl} JPL)</td>
+                </tr>
+            `;
+        });
+
+        const docContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>Jurnal KBM Rebuilt</title></head>
+            <body style="font-family: Arial, sans-serif;">
+                <h2 style="color: #1e3a8a; text-align: center;">JURNAL KEGIATAN BELAJAR MENGAJAR (KBM)</h2>
+                <h3 style="text-align: center; color: #0d9488;">BP3MI Aceh & Program Peningkatan Kapasitas Calon Pekerja Migran</h3>
+                <p><strong>Instruktur:</strong> Giyono Asfarrasyid</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-top: 15px;">
+                    <thead>
+                        <tr style="background-color: #f1f5f9; color: #1e3a8a;">
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">No</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Tanggal</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Hari</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Kompetensi / Modul</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Sub-Pokok Bahasan (in English)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">JPL</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Status / Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRowsHtml}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(docContent);
+        const fileDownload = document.createElement('a');
+        document.body.appendChild(fileDownload);
+        fileDownload.href = source;
+        fileDownload.download = 'Jurnal_KBM_Rebuilt_Day3.doc';
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
+    }
+
+    function exportFullScheduleToWord() {
+        let tableRowsHtml = "";
+        let currentDate = new Date('2026-08-27');
+        let dayCounter = 1;
+        let sectorIdx = 0;
+        let jplInCurrentSector = 0;
+
+        while(dayCounter <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            let dateString = currentDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            let dayNameStr = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dayOfWeek];
+
+            if(dayOfWeek === 0) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+
+            let currentSec = sectorsMaster[sectorIdx];
+            let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
+            let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
+
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInCurrentSector = 0;
+            }
+
+            jplInCurrentSector += jplToday;
+
+            let displaySecName = (dayCounter <= 3) ? activeCurrentSector : currentSec.name;
+            const inputElem = document.getElementById(`sub_input_${dayCounter}`);
+            let subVal = inputElem ? inputElem.value : (subTopicsStore[`day_${dayCounter}`] || '');
+            let isClosed = completedDaysStore[`day_${dayCounter}`] ? `CLOSED (${jplToday} JPL)` : 'Active';
+
+            tableRowsHtml += `
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${dayCounter}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${dateString}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${dayNameStr}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${displaySecName}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${subVal || '-'}</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${jplToday} JPL</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${isClosed}</td>
+                </tr>
+            `;
+
+            if(jplInCurrentSector >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInCurrentSector = 0;
+            }
+
+            dayCounter++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        const docContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>Jadwal Kurikulum 71 Hari</title></head>
+            <body style="font-family: Arial, sans-serif;">
+                <h2 style="color: #1e3a8a; text-align: center;">JADWAL MASTER KURIKULUM 71 HARI (640 JPL)</h2>
+                <h3 style="text-align: center; color: #0d9488;">BP3MI Aceh & Program Peningkatan Kapasitas Calon Pekerja Migran</h3>
+                <p><strong>Instruktur:</strong> Giyono Asfarrasyid</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-top: 15px;">
+                    <thead>
+                        <tr style="background-color: #f1f5f9; color: #1e3a8a;">
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Hari</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Tanggal</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Hari</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Kompetensi / Modul</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Sub-Pokok Bahasan (in English)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">JPL</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Status / Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRowsHtml}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(docContent);
+        const fileDownload = document.createElement('a');
+        document.body.appendChild(fileDownload);
+        fileDownload.href = source;
+        fileDownload.download = 'Jadwal_Master_Kurikulum_71_Hari.doc';
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
+    }
+
+    function printFullSchedule() {
+        window.print();
     }
 
     function unlockOperatorMode() {
@@ -717,19 +1083,19 @@
             liveSectorSelect.style.background = '#ffffff';
             
             liveSectorSelect.onchange = function() {
+                activeCurrentSector = liveSectorSelect.value;
+                localStorage.setItem('bp3mi_active_sector_v3', activeCurrentSector);
                 checkExistingSessionData();
             };
 
-            document.getElementById('journalFeederBox').style.opacity = '1';
-            document.getElementById('journalFeederBox').style.pointerEvents = 'auto';
-            document.getElementById('jnlTopic').disabled = false;
-            document.getElementById('jnlMethod').disabled = false;
             document.getElementById('operatorReviewPanel').style.display = 'block';
             document.getElementById('operatorLockBanner').style.background = '#d1fae5';
-            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Aktif (08.00 s.d. Selesai, Senin s.d. Sabtu, Rollover Serumpun Otomatis)</strong></div>';
+            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Aktif (Kolom Sub-Pokok Bahasan & Edit Jurnal Terbuka)</strong></div>';
             
             checkExistingSessionData();
             updateOperatorReviewStatus();
+            generateMasterKurikulumTable();
+            renderJournalTable();
             alert("Akses operator dibuka sepenuhnya!");
         } else if(inputPwd !== null) {
             alert("Kata sandi salah!");
@@ -743,9 +1109,6 @@
 
         if(recordedSessions[key]) {
             const sess = recordedSessions[key];
-            document.getElementById('jnlTopic').value = sess.journal.topic || '';
-            document.getElementById('jnlMethod').value = sess.journal.method || '';
-            
             if(sess.students) {
                 Object.keys(sess.students).forEach(idx => {
                     const log = sess.students[idx];
@@ -753,18 +1116,17 @@
                     if(chk) chk.checked = log.present;
                 });
             }
-        } else {
-            document.getElementById('jnlTopic').value = '';
-            document.getElementById('jnlMethod').value = '';
         }
     }
 
     function switchView(mode) {
         document.getElementById('viewLive').classList.remove('active-view');
         document.getElementById('viewWeekly').classList.remove('active-view');
+        document.getElementById('viewJournal').classList.remove('active-view');
         document.getElementById('viewMonthly').classList.remove('active-view');
         document.getElementById('btnLive').classList.remove('active');
         document.getElementById('btnWeekly').classList.remove('active');
+        document.getElementById('btnJournal').classList.remove('active');
         document.getElementById('btnMonthly').classList.remove('active');
 
         if(mode === 'live') {
@@ -774,31 +1136,29 @@
         } else if(mode === 'weekly') {
             document.getElementById('viewWeekly').classList.add('active-view');
             document.getElementById('btnWeekly').classList.add('active');
-            renderReportData('weeklyRosterBody', 'weeklyJournalContainer', 'filterWeeklySector');
+            generateMasterKurikulumTable();
+        } else if(mode === 'journal') {
+            document.getElementById('viewJournal').classList.add('active-view');
+            document.getElementById('btnJournal').classList.add('active');
+            renderJournalTable();
         } else {
             document.getElementById('viewMonthly').classList.add('active-view');
             document.getElementById('btnMonthly').classList.add('active');
-            renderReportData('monthlyRosterBody', 'monthlyJournalContainer', 'filterMonthlySector');
+            renderMonthlyReport();
         }
     }
 
     function buildLiveRoster() {
         const currentDate = getCurrentLocalDate();
         document.getElementById('liveDate').value = currentDate;
-        const dayOfWeek = new Date().getDay();
-
-        if(dayOfWeek === 0) {
-            document.getElementById('sundayOffContainer').style.display = 'block';
-            document.getElementById('weekdayContentWrapper').style.display = 'none';
-            return;
-        }
 
         const select = document.getElementById('liveSector');
         select.innerHTML = "";
         sectorsMaster.forEach(sec => {
             const opt = document.createElement('option');
-            opt.value = sec.id;
-            opt.text = `${sec.name} (${sec.totalJpl} JPL - 08.00 s.d. Selesai)`;
+            opt.value = sec.name;
+            opt.text = `${sec.name} (${sec.totalJpl} JPL)`;
+            if(sec.name === activeCurrentSector) opt.selected = true;
             select.appendChild(opt);
         });
 
@@ -899,7 +1259,6 @@
     function saveAndRecordSession() {
         const currentDate = getCurrentLocalDate();
         const sectorVal = document.getElementById('liveSector').value;
-        const sectorObj = sectorsMaster.find(s => s.id === sectorVal);
         const key = `${currentDate}_${sectorVal}`;
 
         let studentLogs = {};
@@ -924,17 +1283,13 @@
 
         const sessionData = {
             date: currentDate,
-            sectorInfo: sectorObj ? sectorObj.name : sectorVal,
-            timeSlot: "08.00 s.d. 16.55 WIB (9 JPL)",
-            journal: {
-                topic: document.getElementById('jnlTopic').value || '-',
-                method: document.getElementById('jnlMethod').value || '-'
-            },
+            sectorInfo: sectorVal,
+            timeSlot: "08.00 - 15.30 WIB (9 JPL Strict)",
             students: studentLogs
         };
 
         recordedSessions[key] = sessionData;
-        localStorage.setItem('bp3mi_attendance_cloud_v1', JSON.stringify(recordedSessions));
+        localStorage.setItem('bp3mi_attendance_cloud_v3', JSON.stringify(recordedSessions));
 
         const webhookUrl = getWebhookUrl();
         if(webhookUrl) {
@@ -944,32 +1299,30 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(sessionData)
             }).then(() => {
-                alert("Data berhasil dicatat (08.00 s.d. Selesai) & sukses terkirim ke Google Sheet arsip!");
-                renderReportData('weeklyRosterBody', 'weeklyJournalContainer', 'filterWeeklySector');
+                alert("Data presensi berhasil dicatat & sukses terkirim ke Google Sheet arsip!");
+                renderMonthlyReport();
             }).catch(err => {
-                alert("Tersimpan di perangkat lokal.");
-                renderReportData('weeklyRosterBody', 'weeklyJournalContainer', 'filterWeeklySector');
+                alert("Presensi tersimpan di perangkat lokal.");
+                renderMonthlyReport();
             });
         }
-
-        populateFilterDropdowns();
     }
 
-    function renderReportData(tbodyId, jnlContainerId, filterSelectId) {
-        const tbody = document.getElementById(tbodyId);
-        const jnlContainer = document.getElementById(jnlContainerId);
-        const filterSelect = document.getElementById(filterSelectId);
+    function renderMonthlyReport() {
+        const tbody = document.getElementById('monthlyRosterBody');
+        const jnlContainer = document.getElementById('monthlyJournalContainer');
+        const filterSelect = document.getElementById('filterMonthlySector');
         
         if(!tbody || !jnlContainer || !filterSelect) return;
         const selectedFilter = filterSelect.value;
         
         tbody.innerHTML = "";
-        jnlContainer.innerHTML = "<h4>📖 Riwayat Berita Journal & Rekap Sesi Harian</h4>";
+        jnlContainer.innerHTML = "<h4>📖 Ringkasan Jurnal Sesi Terekam</h4>";
 
         const keys = Object.keys(recordedSessions).sort().reverse();
         if(keys.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:15px; color:#64748b;">Belum ada arsip sesi tersimpan. Silakan simpan sesi di menu Live.</td></tr>`;
-            jnlContainer.innerHTML += `<p style="font-size:0.85rem; color:#64748b; font-style:italic;">Belum ada berita journal terekam.</p>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:15px; color:#64748b;">Belum ada arsip sesi tersimpan.</td></tr>`;
+            jnlContainer.innerHTML += `<p style="font-size:0.85rem; color:#64748b; font-style:italic;">Belum ada jurnal terekam.</p>`;
             return;
         }
 
@@ -979,18 +1332,11 @@
             return sess.sectorInfo === selectedFilter;
         });
 
-        if(filteredKeys.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:15px; color:#64748b;">Tidak ada data arsip untuk kompetensi ini.</td></tr>`;
-            jnlContainer.innerHTML += `<p style="font-size:0.85rem; color:#64748b; font-style:italic;">Tidak ada jurnal.</p>`;
-            return;
-        }
-
         filteredKeys.forEach(key => {
             const sess = recordedSessions[key];
             jnlContainer.innerHTML += `
                 <div style="background:#f8fafc; padding:10px; margin-bottom:8px; border-left:4px solid #1e3a8a; border-radius:4px; font-size:0.85rem;">
-                    <strong>📅 Tanggal: ${sess.date} | 📚 Kompetensi: ${sess.sectorInfo} (${sess.timeSlot || '08.00 s.d. Selesai'})</strong><br>
-                    <span><strong>Topik / Materi:</strong> ${sess.journal.topic}</span> | <span><strong>Metode:</strong> ${sess.journal.method}</span>
+                    <strong>📅 Tanggal: ${sess.date} | 📚 Kompetensi: ${sess.sectorInfo} (${sess.timeSlot})</strong>
                 </div>
             `;
             
