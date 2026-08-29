@@ -481,7 +481,7 @@
         </div>
     </div>
 
-    <!-- VIEW 3: JOURNAL KBM & PROGRESS [FULLY SYNCHRONIZED] -->
+    <!-- VIEW 3: JOURNAL KBM & PROGRESS [FULLY PERMANENT LOCKED WHEN SAVED] -->
     <div id="viewJournal" class="view-section">
         <h3>📖 Jurnal KBM & Progress</h3>
         <p style="font-size: 0.88rem; color: #475569;">Dokumen resmi jurnal capaian belajar dalam penyelesaian kompetensi keperawatan profesional (Tersinkronisasi otomatis dengan Master Tabel secara runtut).</p>
@@ -579,6 +579,7 @@
     let subTopicsStore = JSON.parse(localStorage.getItem('bp3mi_subtopics_v3') || '{}');
     let customSectorsStore = JSON.parse(localStorage.getItem('bp3mi_custom_sectors_v3') || '{}');
     let completedDaysStore = JSON.parse(localStorage.getItem('bp3mi_completed_days_v3') || '{}');
+    let journalLockedStates = JSON.parse(localStorage.getItem('bp3mi_journal_locks_v3') || '{}');
     let activeCurrentSector = localStorage.getItem('bp3mi_active_sector_v3') || "1.1 English Basic Pattern";
     let isOperatorUnlocked = false;
 
@@ -587,7 +588,13 @@
         if(!subTopicsStore['day_2']) subTopicsStore['day_2'] = "Pronouns, Nouns & Clinical Naming";
         if(!subTopicsStore['day_3']) subTopicsStore['day_3'] = "Job interview";
 
+        // Default locked status for initial days if not explicitly set
+        if(journalLockedStates['day_1'] === undefined) journalLockedStates['day_1'] = true;
+        if(journalLockedStates['day_2'] === undefined) journalLockedStates['day_2'] = true;
+        if(journalLockedStates['day_3'] === undefined) journalLockedStates['day_3'] = true;
+
         localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
     }
 
@@ -810,14 +817,12 @@
             let currentSubVal = subTopicsStore[subTopicKey] || '';
             let isPastOrToday = currentDate <= systemCurrentDate;
 
-            // Build sector dropdown options
             let sectorOptionsHtml = "";
             sectorsMaster.forEach(s => {
                 let sel = (s.name === currentCustomSec) ? 'selected' : '';
                 sectorOptionsHtml += `<option value="${s.name}" ${sel}>${s.name}</option>`;
             });
 
-            // Check if selected module differs from the default sequence to trigger red warning on JPL
             let isModifiedModule = (currentCustomSec !== defaultSecName);
             let jplDisplayStyle = isModifiedModule ? 'color: #dc2626; font-weight: bold; background: #fee2e2;' : 'color: #047857; font-weight: bold;';
 
@@ -861,7 +866,6 @@
         localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
         syncCompletedDaysFromMaster();
 
-        // Highlight JPL cell red dynamically on change
         let defaultSecName = getDefaultSectorForDay(dayNum);
         let jplCell = document.getElementById(`jpl_cell_${dayNum}`);
         if(jplCell) {
@@ -877,24 +881,12 @@
                 jplCell.title = '';
             }
         }
-
-        // Live update corresponding journal sector select or span if visible
-        const journalSelect = document.getElementById(`journal_sector_${dayNum}`);
-        if(journalSelect) {
-            journalSelect.value = val;
-        }
     }
 
     function liveSyncSubTopic(dayNum, val) {
         subTopicsStore[`day_${dayNum}`] = val;
         localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
         syncCompletedDaysFromMaster();
-        
-        // Live update corresponding journal input field if visible
-        const journalInput = document.getElementById(`journal_sub_${dayNum}`);
-        if(journalInput) {
-            journalInput.value = val;
-        }
     }
 
     function saveSingleMasterRow(dayNum) {
@@ -912,12 +904,16 @@
 
         customSectorsStore[`day_${dayNum}`] = secVal;
         subTopicsStore[`day_${dayNum}`] = subVal;
+        
+        // Permanently lock this journal row state as closed & saved
+        journalLockedStates[`day_${dayNum}`] = true;
 
         localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
         localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
 
-        alert(`Hari ke-${dayNum} Kompetensi/Modul & Sub-Pokok Bahasan berhasil disubmit dan disinkronkan ke Jurnal KBM!`);
+        alert(`Hari ke-${dayNum} Kompetensi/Modul & Sub-Pokok Bahasan berhasil disubmit dan dikunci permanen di Jurnal KBM!`);
         generateMasterKurikulumTable();
         renderJournalTable();
         buildLiveRoster();
@@ -963,6 +959,7 @@
                 if(inputElem.value.trim() !== '') {
                     subTopicsStore[`day_${dayCounter}`] = inputElem.value.trim();
                 }
+                journalLockedStates[`day_${dayCounter}`] = true;
                 countSaved++;
             }
 
@@ -976,9 +973,10 @@
 
         localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
         localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
 
-        alert(`${countSaved} Data Kurikulum & Sub-Pokok Bahasan berhasil disimpan dan disinkronkan serentak ke Jurnal KBM!`);
+        alert(`${countSaved} Data Kurikulum & Sub-Pokok Bahasan berhasil disimpan dan dikunci permanen di Jurnal KBM!`);
         generateMasterKurikulumTable();
         renderJournalTable();
     }
@@ -1006,89 +1004,67 @@
             let isModifiedModule = (item.sector !== defaultSecName);
             let jplDisplayStyle = isModifiedModule ? 'color: #dc2626; font-weight: bold; background: #fee2e2;' : 'color: #dc2626; font-weight: bold;';
 
-            // Build sector dropdown options for journal
-            let sectorOptionsHtml = "";
-            sectorsMaster.forEach(s => {
-                let sel = (s.name === item.sector) ? 'selected' : '';
-                sectorOptionsHtml += `<option value="${s.name}" ${sel}>${s.name}</option>`;
-            });
+            // Check if this row is permanently locked/saved
+            let isLocked = journalLockedStates[k] !== undefined ? journalLockedStates[k] : true;
 
-            tbody.innerHTML += `
-                <tr>
-                    <td style="text-align:center; font-weight:bold;">${item.day}</td>
-                    <td>${item.dateStr}</td>
-                    <td><strong>${item.dayName}</strong></td>
-                    <td>
-                        <select id="journal_sector_${dayNum}" ${isOperatorUnlocked ? '' : 'disabled'} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isOperatorUnlocked ? '#fff' : '#f8fafc'};" onchange="liveSyncSectorFromJournal(${dayNum}, this.value)">
-                            ${sectorOptionsHtml}
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" id="journal_sub_${dayNum}" value="${item.subTopic}" ${isOperatorUnlocked ? '' : 'disabled'} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isOperatorUnlocked ? '#fff' : '#f8fafc'};" oninput="liveSyncFromJournal(${dayNum}, this.value)">
-                    </td>
-                    <td style="text-align:center; ${jplDisplayStyle}" id="journal_jpl_${dayNum}" title="${isModifiedModule ? 'Modul diubah oleh operator (menyusut/menyesuaikan alokasi)' : ''}">${item.jpl} JPL</td>
-                    <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold; display:inline-block;">CLOSED (${item.cumulative} JPL)</span></td>
-                    <td style="text-align:center;">
-                        <button type="button" class="btn-edit-journal" onclick="enableJournalEdit(${dayNum})" ${isOperatorUnlocked ? '' : 'disabled'}>Edit</button>
-                        <button type="button" class="btn-save-journal" onclick="saveJournalEdit('${k}', ${dayNum})" ${isOperatorUnlocked ? '' : 'disabled'}>Save</button>
-                    </td>
-                </tr>
-            `;
+            if (isLocked) {
+                // Permanent locked view: displays clean text that remains identical whether opened or closed
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align:center; font-weight:bold;">${item.day}</td>
+                        <td>${item.dateStr}</td>
+                        <td><strong>${item.dayName}</strong></td>
+                        <td>${item.sector}</td>
+                        <td>${item.subTopic}</td>
+                        <td style="text-align:center; ${jplDisplayStyle}">${item.jpl} JPL</td>
+                        <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold; display:inline-block;">CLOSED (${item.cumulative} JPL)</span></td>
+                        <td style="text-align:center;">
+                            <button type="button" class="btn-edit-journal" onclick="enableJournalEdit(${dayNum})" ${isOperatorUnlocked ? '' : 'disabled'}>Edit</button>
+                            <button type="button" class="btn-save-journal" onclick="saveJournalEdit('${k}', ${dayNum})" disabled style="opacity:0.5; cursor:not-allowed;">Save</button>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                // Unlocked editable form view when operator hits Edit
+                let sectorOptionsHtml = "";
+                sectorsMaster.forEach(s => {
+                    let sel = (s.name === item.sector) ? 'selected' : '';
+                    sectorOptionsHtml += `<option value="${s.name}" ${sel}>${s.name}</option>`;
+                });
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align:center; font-weight:bold;">${item.day}</td>
+                        <td>${item.dateStr}</td>
+                        <td><strong>${item.dayName}</strong></td>
+                        <td>
+                            <select id="journal_sector_${dayNum}" style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:#fff;">
+                                ${sectorOptionsHtml}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" id="journal_sub_${dayNum}" value="${item.subTopic}" style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:#fff;">
+                        </td>
+                        <td style="text-align:center; ${jplDisplayStyle}">${item.jpl} JPL</td>
+                        <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold; display:inline-block;">EDITING (${item.cumulative} JPL)</span></td>
+                        <td style="text-align:center;">
+                            <button type="button" class="btn-edit-journal" disabled style="opacity:0.5; cursor:not-allowed;">Edit</button>
+                            <button type="button" class="btn-save-journal" onclick="saveJournalEdit('${k}', ${dayNum})">Save</button>
+                        </td>
+                    </tr>
+                `;
+            }
         });
     }
 
-    function liveSyncSectorFromJournal(dayNum, val) {
-        customSectorsStore[`day_${dayNum}`] = val;
-        localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
-        syncCompletedDaysFromMaster();
-
-        let defaultSecName = getDefaultSectorForDay(dayNum);
-        let jplCell = document.getElementById(`journal_jpl_${dayNum}`);
-        if(jplCell) {
-            if(val !== defaultSecName) {
-                jplCell.style.color = '#dc2626';
-                jplCell.style.fontWeight = 'bold';
-                jplCell.style.backgroundColor = '#fee2e2';
-                jplCell.title = 'Modul diubah oleh operator (menyusut/menyesuaikan alokasi)';
-            } else {
-                jplCell.style.color = '#dc2626';
-                jplCell.style.fontWeight = 'bold';
-                jplCell.style.backgroundColor = 'transparent';
-                jplCell.title = '';
-            }
-        }
-
-        // Live update master table select if visible
-        const masterSelect = document.getElementById(`master_sector_${dayNum}`);
-        if(masterSelect) {
-            masterSelect.value = val;
-        }
-    }
-
-    function liveSyncFromJournal(dayNum, val) {
-        subTopicsStore[`day_${dayNum}`] = val;
-        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
-        syncCompletedDaysFromMaster();
-
-        // Live update master table input field if visible
-        const masterInput = document.getElementById(`sub_input_${dayNum}`);
-        if(masterInput) {
-            masterInput.value = val;
-        }
-    }
-
     function enableJournalEdit(dayNum) {
-        const inputElem = document.getElementById(`journal_sub_${dayNum}`);
-        const selectElem = document.getElementById(`journal_sector_${dayNum}`);
-        if(inputElem) {
-            inputElem.disabled = false;
-            inputElem.style.background = '#ffffff';
-            inputElem.focus();
+        if(!isOperatorUnlocked) {
+            alert("Buka akses operator terlebih dahulu dengan kata sandi!");
+            return;
         }
-        if(selectElem) {
-            selectElem.disabled = false;
-            selectElem.style.background = '#ffffff';
-        }
+        journalLockedStates[`day_${dayNum}`] = false;
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        renderJournalTable();
     }
 
     function saveJournalEdit(key, dayNum) {
@@ -1110,12 +1086,14 @@
 
         subTopicsStore[key] = val;
         customSectorsStore[key] = secVal;
+        journalLockedStates[key] = true; // Lock back permanently after saving
 
         localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
         localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
 
-        alert(`Koreksi Jurnal KBM Hari ke-${dayNum} berhasil disimpan dan disinkronkan ke Master Kurikulum!`);
+        alert(`Koreksi Jurnal KBM Hari ke-${dayNum} berhasil disimpan dan dikunci permanen!`);
         renderJournalTable();
         generateMasterKurikulumTable();
     }
@@ -1295,7 +1273,7 @@
             updateOperatorReviewStatus();
             generateMasterKurikulumTable();
             renderJournalTable();
-            alert("Akses operator dibuka sepenuhnya dengan sinkronisasi otomatis dua arah untuk modul & sub-topik!");
+            alert("Akses operator dibuka sepenuhnya!");
         } else if(inputPwd !== null) {
             alert("Kata sandi salah!");
         }
@@ -1531,7 +1509,6 @@
             return sess.sectorInfo === selectedFilter;
         });
 
-        filteredKeys.setItem = filteredKeys || [];
         filteredKeys.forEach(key => {
             const sess = recordedSessions[key];
             jnlContainer.innerHTML += `
