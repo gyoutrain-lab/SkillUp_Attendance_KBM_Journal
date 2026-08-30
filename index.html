@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Master Kurikulum 640 JPL</title>
+    
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #0d9488;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .locked-header {
+            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .locked-header h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.15rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 8px;
+            color: white !important;
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            font-size: 0.88rem;
+        }
+
+        .mode-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 0.85rem;
+        }
+
+        .nav-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active-view {
+            display: block;
+        }
+
+        .session-control-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.88rem;
+            box-sizing: border-box;
+        }
+
+        .filter-report-box {
+            background: #f0fdf4;
+            border: 1px solid #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .schedule-timeline-box {
+            background: #fdf8f6;
+            border: 1px solid #f97316;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .schedule-timeline-box h4 {
+            margin: 0 0 10px 0;
+            color: #c2410c;
+            font-size: 0.95rem;
+            border-bottom: 1px dashed #fed7aa;
+            padding-bottom: 5px;
+        }
+
+        .operator-lock-banner {
+            background: #fffbeb;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-unlock {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .operator-review-panel {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .review-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            background: white;
+            padding: 10px;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            margin-top: 15px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+            font-size: 1.05rem;
+        }
+
+        .presence-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            background: white;
+        }
+
+        .presence-table th, .presence-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px 10px;
+            vertical-align: middle;
+        }
+
+        .presence-table th {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .student-number {
+            text-align: center;
+            font-weight: bold;
+            width: 35px;
+        }
+
+        .student-name {
+            font-weight: 600;
+            width: 180px;
+        }
+
+        .checkbox-center {
+            text-align: center;
+            width: 70px;
+        }
+
+        .attendance-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--secondary-color);
+            cursor: pointer;
+        }
+
+        .sig-cell {
+            text-align: center;
+            width: 200px;
+        }
+
+        .individual-canvas {
+            border: 1px dashed #94a3b8;
+            background: #fafafa;
+            cursor: crosshair;
+            display: block;
+            margin: 0 auto;
+            width: 180px;
+            height: 60px;
+            border-radius: 4px;
+            touch-action: none;
+        }
+
+        .btn-clear-mini {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 2px 5px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-export {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-doc {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-save-sub {
+            background-color: #059669;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
+        .btn-edit-journal {
+            background-color: #d97706;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+
+        .btn-save-journal {
+            background-color: #059669;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .alert-box {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media print {
+            body { background: white; padding: 0; font-size: 10pt; }
+            .container { box-shadow: none; padding: 2px; max-width: 100%; }
+            .mode-nav, .session-control-box, .operator-lock-banner, .operator-review-panel, .actions, .btn-clear-mini, .filter-report-box, .btn-save-sub, .btn-edit-journal, .btn-save-journal { display: none !important; }
+            .locked-header { -webkit-print-color-adjust: exact; background: #1e3a8a !important; padding: 8px; }
+            .presence-table { font-size: 8pt; }
+            tr { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="locked-header">
+        <h2>BP3MI Aceh & Program Peningkatan Kapasitas Calon Pekerja Migran</h2>
+        <div class="header-grid">
+            <div><strong>Program:</strong> Master Kurikulum 640 JPL</div>
+            <div><strong>Instruktur:</strong> <span id="displayInstructor">Giyono Asfarrasyid</span></div>
+            <div><strong>Sisa Target JPL:</strong> <span id="displayRemainingJpl" style="font-weight:bold; color:#fde047;">613 JPL</span></div>
+        </div>
+    </div>
+
+    <div style="display:none;">
+        <input type="text" id="cloudWebhookUrl" value="https://script.google.com/macros/s/AKfycbz08KB4ONGMQUU6CDCEOuXjn4eKk_RMEMdWHGdkLuccCnxSgCIG02dipNNAvgt0-b93/exec">
+    </div>
+
+    <div class="mode-nav">
+        <button class="nav-btn active" id="btnLive" onclick="switchView('live')">🔴 Live Presensi & Tanda Tangan</button>
+        <button class="nav-btn" id="btnWeekly" onclick="switchView('weekly')">📅 Master Tabel Kurikulum (Hari 1-71)</button>
+        <button class="nav-btn" id="btnJournal" onclick="switchView('journal')">📖 Jurnal KBM & Progress</button>
+        <button class="nav-btn" id="btnMonthly" onclick="switchView('monthly')">📊 Monthly Report & Rekap</button>
+    </div>
+
+    <!-- VIEW 1: LIVE -->
+    <div id="viewLive" class="view-section active-view">
+        <div class="alert-box">
+            <span>🔒 <strong>Status Hari Ini:</strong> Hari ke-3 (Sabtu, 29 Agustus 2026). Sesi konsisten 9 JPL per hari.</span>
+            <button class="nav-btn" onclick="switchView('weekly')" style="padding: 4px 10px; font-size:0.78rem;">🔍 Lihat Tabel Master Hari 1-71</button>
+        </div>
+
+        <div class="session-control-box">
+            <div class="control-group">
+                <label>Tanggal Sistem (Live):</label>
+                <input type="date" id="liveDate" readonly style="background:#e2e8f0; font-weight:bold;">
+            </div>
+            <div class="control-group">
+                <label>Kompetensi Sesuai Alokasi:</label>
+                <select id="liveSector" style="background:#e2e8f0;" disabled onchange="handleLiveSectorChange()"></select>
+            </div>
+            <div class="control-group">
+                <label>Alokasi Waktu Harian:</label>
+                <input type="text" value="08.00 - 15.30 WIB (9 JPL Strict)" readonly style="background:#e2e8f0; font-weight:bold; color:#047857;">
+            </div>
+        </div>
+
+        <div id="weekdayContentWrapper">
+            <div class="operator-lock-banner" id="operatorLockBanner">
+                <div><strong>🔒 Akses Kontrol:</strong> Masukkan sandi operator untuk mengisi Kompetensi/Modul, Sub-Pokok Bahasan & jurnal harian.</div>
+                <button class="btn-unlock" onclick="unlockOperatorMode()">🔓 Masukkan Sandi Operator</button>
+            </div>
+
+            <div class="operator-review-panel" id="operatorReviewPanel">
+                <h4>👀 Panel Monitoring Status Tanda Tangan:</h4>
+                <div class="review-status-grid" id="reviewStatusGrid"></div>
+            </div>
+
+            <h3>Formulir Kehadiran & Tanda Tangan Digital Peserta</h3>
+
+            <table class="presence-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Peserta Perawat</th>
+                        <th class="checkbox-center">Hadir (✔)</th>
+                        <th>Tanda Tangan Digital</th>
+                    </tr>
+                </thead>
+                <tbody id="liveRosterBody"></tbody>
+            </table>
+
+            <div class="actions">
+                <span style="font-size: 0.85rem; color: #166534; font-weight: bold;" id="liveMsg"></span>
+                <button class="btn-export" onclick="saveAndRecordSession()">💾 Simpan & Kirim ke Google Sheet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 2: MASTER KURIKULUM TABLE -->
+    <div id="viewWeekly" class="view-section">
+        <h3>📅 Master Tabel Kurikulum (Full 71 Hari - Hari Minggu Libur Merah)</h3>
+        
+        <div class="filter-report-box">
+            <div style="flex: 1; min-width: 280px;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Status Master (Locked):</label>
+                <input type="text" value="Mulai 27 Agu 2026 | Hari Minggu Libur | Total 640 JPL" readonly style="width: 100%; padding: 7px; border: 1px solid #10b981; border-radius: 4px; font-size: 0.88rem; background:#f0fdf4; font-weight:bold;">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="nav-btn" style="background:#059669; color:white;" onclick="saveAllMasterData()">💾 Save All Master Data (Modul & Sub)</button>
+            </div>
+        </div>
+
+        <div class="schedule-timeline-box" style="margin-bottom: 25px;">
+            <h4>📋 Jadwal Harian Lengkap (Hari 1 s.d. 71) & Kolom Sub-Pokok Bahasan</h4>
+            <div style="max-height: 480px; overflow-y: auto;" id="masterTableContainer">
+                <table class="presence-table" style="font-size: 0.8rem; margin-top: 5px;">
+                    <thead style="position: sticky; top: 0; background: #f1f5f9; z-index: 2;">
+                        <tr>
+                            <th style="width: 45px;">Hari</th>
+                            <th style="width: 95px;">Tanggal</th>
+                            <th style="width: 80px;">Hari</th>
+                            <th style="width: 210px;">Kompetensi / Modul</th>
+                            <th style="width: 220px;">Sub-Pokok Bahasan (in English)</th>
+                            <th style="width: 75px;">Aksi Save</th>
+                            <th style="width: 65px;">JPL</th>
+                            <th style="width: 120px;">Status / Akumulasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="masterKurikulumTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="actions">
+            <span style="font-size: 0.85rem; color: #065f46; font-weight: bold;">Cetak / Ekspor Jadwal Full 71 Hari:</span>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-doc" onclick="exportFullScheduleToWord()">📄 Export 71 Hari ke Doc (Word)</button>
+                <button class="btn-export" onclick="printFullSchedule()">🖨️ Print Jadwal 71 Hari</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 3: JOURNAL KBM & PROGRESS -->
+    <div id="viewJournal" class="view-section">
+        <h3>📖 Jurnal KBM & Progress</h3>
+        <p style="font-size: 0.88rem; color: #475569;">Dokumen resmi jurnal capaian belajar dalam penyelesaian kompetensi keperawatan profesional (Tersinkronisasi otomatis dengan Master Tabel secara runtut).</p>
+        
+        <div style="overflow-x: auto; margin-top: 15px; margin-bottom: 20px;">
+            <table class="presence-table" style="font-size: 0.82rem;">
+                <thead>
+                    <tr>
+                        <th style="width: 45px;">Hari Ke</th>
+                        <th style="width: 100px;">Tanggal Selesai</th>
+                        <th style="width: 85px;">Hari</th>
+                        <th style="width: 210px;">Kompetensi / Modul</th>
+                        <th style="width: 220px;">Sub-Pokok Bahasan (in English)</th>
+                        <th style="width: 70px;">JPL</th>
+                        <th style="width: 120px;">Akumulasi Closed JPL</th>
+                        <th style="width: 140px;">Aksi Terpisah (Edit / Save)</th>
+                    </tr>
+                </thead>
+                <tbody id="journalTableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="actions">
+            <span style="font-size: 0.85rem; color: #1e3a8a; font-weight: bold;">Dokumentasi Jurnal KBM Resmi:</span>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-doc" onclick="exportJournalToWord()">📄 Export Jurnal ke Doc (Word)</button>
+                <button class="btn-export" onclick="window.print()">🖨️ Print Jurnal KBM</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 4: MONTHLY REPORT -->
+    <div id="viewMonthly" class="view-section">
+        <h3>📊 Monthly Report & Rekapitulasi (640 JPL)</h3>
+        <div class="filter-report-box">
+            <div style="flex: 1;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Pilih Kompetensi / Sektor:</label>
+                <select id="filterMonthlySector" onchange="renderMonthlyReport()" style="width: 100%; padding: 7px; border: 1px solid #10b981; border-radius: 4px; font-size: 0.88rem;"></select>
+            </div>
+        </div>
+        <div id="monthlyJournalContainer" style="margin-bottom: 20px;"></div>
+        <table class="presence-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">No</th>
+                    <th>Nama Peserta Perawat</th>
+                    <th class="checkbox-center">Kehadiran</th>
+                    <th>Tanda Tangan Digital</th>
+                </tr>
+            </thead>
+            <tbody id="monthlyRosterBody"></tbody>
+        </table>
+        <div class="actions">
+            <span></span>
+            <button class="btn-export" onclick="window.print()">🖨️ Cetak / Print Dokumen</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const students = [
+        "Putri Intan Ridayana", "Elya Susanti", "Maulidar", "Anis Sagita", "Intan Sasrika", 
+        "Delfira Milda", "Safira Kemala Putri", "Rahmatillah", "Rizki Febriwanti", "Sarah Salsa Fitri", 
+        "Mirdha Rosalinda", "Fezdriani", "Miftahul Hasanah", "Qhotorun Nada Sari", "Maisarah", 
+        "Nadariah", "Irmanda Putri Safira", "Ayu Anggira Effendi", "Nadia Vonna", "Fitriani"
+    ];
+
+    const sectorsMaster = [
+        { id: "eng_pattern", name: "1.1 English Basic Pattern", totalJpl: 18, cluster: "Bahasa Inggris" },
+        { id: "eng_pos", name: "1.2 English Parts of Speech", totalJpl: 9, cluster: "Bahasa Inggris" },
+        { id: "eng_tenses", name: "1.3 English Tenses", totalJpl: 45, cluster: "Bahasa Inggris" },
+        { id: "eng_sentences", name: "1.4 English Sentences", totalJpl: 54, cluster: "Bahasa Inggris" },
+        { id: "eng_vocab", name: "1.5 Vocabulary Building", totalJpl: 36, cluster: "Bahasa Inggris" },
+        { id: "prom_intro", name: "2.1 Introduction to Prometric Test", totalJpl: 18, cluster: "Prometric & SCFHS" },
+        { id: "prom_compare", name: "2.2 SCFHS vs STR & NCLEX", totalJpl: 9, cluster: "Prometric & SCFHS" },
+        { id: "prom_facts", name: "2.3 SCFHS Facts", totalJpl: 18, cluster: "Prometric & SCFHS" },
+        { id: "prom_tech", name: "2.4 Practice Simulation: Nurse Technician", totalJpl: 36, cluster: "Prometric & SCFHS" },
+        { id: "prom_spec", name: "2.5 Practice Simulation: Nurse Specialist", totalJpl: 27, cluster: "Prometric & SCFHS" },
+        { id: "job_rationale", name: "3.1 Job Interview Rationale", totalJpl: 9, cluster: "Wawancara & Karier" },
+        { id: "job_str", name: "3.2 Behavioral STR Technique", totalJpl: 18, cluster: "Wawancara & Karier" },
+        { id: "job_selfintro", name: "3.3 Self Introduction", totalJpl: 27, cluster: "Wawancara & Karier" },
+        { id: "job_cases", name: "3.4 Most Cases & How To", totalJpl: 27, cluster: "Wawancara & Karier" },
+        { id: "job_sim", name: "3.5 Practice Job Interview Simulation", totalJpl: 18, cluster: "Wawancara & Karier" },
+        { id: "nurs_sop", name: "4.1 Nursing Care Standard Procedure", totalJpl: 9, cluster: "Klinis & SOP" },
+        { id: "nurs_daily", name: "4.2 Daily Life as a Nurse", totalJpl: 9, cluster: "Klinis & SOP" },
+        { id: "nurs_treat", name: "4.3 How to Practice Clinical Treatment", totalJpl: 63, cluster: "Klinis & SOP" },
+        { id: "nurs_ethics", name: "5. Ethics & Workplace Adaptation", totalJpl: 45, cluster: "Etika & Hukum" },
+        { id: "global_legal", name: "6. Global Mobility & Legal Compliance", totalJpl: 45, cluster: "Etika & Hukum" },
+        { id: "daily_integ", name: "7. Daily Life Integration", totalJpl: 45, cluster: "Integrasi & Portofolio" },
+        { id: "cert_port", name: "8. Certification / Portfolio", totalJpl: 27, cluster: "Integrasi & Portofolio" },
+        { id: "final_sim", name: "9. Integrated Simulation & Final Assessment", totalJpl: 28, cluster: "Integrasi & Portofolio" }
+    ];
+
+    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_cloud_v3') || '{}');
+    let subTopicsStore = JSON.parse(localStorage.getItem('bp3mi_subtopics_v3') || '{}');
+    let customSectorsStore = JSON.parse(localStorage.getItem('bp3mi_custom_sectors_v3') || '{}');
+    let completedDaysStore = JSON.parse(localStorage.getItem('bp3mi_completed_days_v3') || '{}');
+    let journalLockedStates = JSON.parse(localStorage.getItem('bp3mi_journal_locks_v3') || '{}');
+    let activeCurrentSector = localStorage.getItem('bp3mi_active_sector_v3') || "1.1 English Basic Pattern";
+    let isOperatorUnlocked = false;
+
+    function initDefaultData() {
+        if(!subTopicsStore['day_1']) subTopicsStore['day_1'] = "Basic Sentences & Professional Greetings";
+        if(!subTopicsStore['day_2']) subTopicsStore['day_2'] = "Pronouns, Nouns & Clinical Naming";
+        if(!subTopicsStore['day_3']) subTopicsStore['day_3'] = "Job interview";
+
+        if(journalLockedStates['day_1'] === undefined) journalLockedStates['day_1'] = true;
+        if(journalLockedStates['day_2'] === undefined) journalLockedStates['day_2'] = true;
+        if(journalLockedStates['day_3'] === undefined) journalLockedStates['day_3'] = true;
+
+        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        syncCompletedDaysFromMaster();
+    }
+
+    // Fungsi Pengatur Instruktur Berdasarkan Modul 4.1, 4.2, 4.3
+    function updateInstructorDisplay(sectorName) {
+        const instructorSpan = document.getElementById('displayInstructor');
+        if (!instructorSpan) return;
+        
+        // Cek apakah modul mencakup 4.1, 4.2, atau 4.3
+        if (sectorName.startsWith("4.1") || sectorName.startsWith("4.2") || sectorName.startsWith("4.3")) {
+            instructorSpan.innerText = "Rizkia Funna";
+        } else {
+            instructorSpan.innerText = "Giyono Asfarrasyid";
+        }
+    }
+
+    function handleLiveSectorChange() {
+        const liveSectorSelect = document.getElementById('liveSector');
+        if(!liveSectorSelect) return;
+        activeCurrentSector = liveSectorSelect.value;
+        localStorage.setItem('bp3mi_active_sector_v3', activeCurrentSector);
+        updateInstructorDisplay(activeCurrentSector);
+    }
+
+    function getDefaultSectorForDay(dayNum) {
+        let currentDate = new Date('2026-08-27');
+        let dCount = 1;
+        let sectorIdx = 0;
+        let jplInSec = 0;
+
+        while(dCount <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            if(dayOfWeek === 0) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+            let currentSec = sectorsMaster[sectorIdx];
+            let rem = currentSec.totalJpl - jplInSec;
+            let jplToday = (rem < 9 && rem > 0) ? rem : 9;
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInSec = 0;
+            }
+            jplInSec += jplToday;
+
+            if(dCount === dayNum) {
+                return currentSec.name;
+            }
+
+            if(jplInSec >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInSec = 0;
+            }
+            dCount++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        return sectorsMaster[0].name;
+    }
+
+    function syncCompletedDaysFromMaster() {
+        completedDaysStore = {};
+        let currentDate = new Date('2026-08-27');
+        let systemCurrentDate = new Date('2026-08-29');
+        let dayCounter = 1;
+        let sectorIdx = 0;
+        let jplInCurrentSector = 0;
+        let cumulativeJpl = 0;
+
+        while(dayCounter <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            if(dayOfWeek === 0) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+
+            let dateString = currentDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            let dayNameStr = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dayOfWeek];
+
+            let currentSec = sectorsMaster[sectorIdx];
+            let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
+            let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
+
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInCurrentSector = 0;
+            }
+
+            jplInCurrentSector += jplToday;
+            cumulativeJpl += jplToday;
+
+            if(currentDate <= systemCurrentDate) {
+                let subVal = subTopicsStore[`day_${dayCounter}`] || '-';
+                let sectorVal = customSectorsStore[`day_${dayCounter}`] || getDefaultSectorForDay(dayCounter);
+                completedDaysStore[`day_${dayCounter}`] = {
+                    day: dayCounter,
+                    dateStr: dateString,
+                    dayName: dayNameStr,
+                    sector: sectorVal,
+                    subTopic: subVal,
+                    jpl: jplToday,
+                    cumulative: cumulativeJpl
+                };
+            }
+
+            if(jplInCurrentSector >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInCurrentSector = 0;
+            }
+
+            dayCounter++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        localStorage.setItem('bp3mi_completed_days_v3', JSON.stringify(completedDaysStore));
+    }
+
+    initDefaultData();
+
+    function getCurrentLocalDate() {
+        return "2026-08-29";
+    }
+
+    function getWebhookUrl() {
+        return document.getElementById('cloudWebhookUrl').value;
+    }
+
+    window.onload = function() {
+        buildLiveRoster();
+        populateFilterDropdowns();
+        generateMasterKurikulumTable();
+        renderJournalTable();
+        renderMonthlyReport();
+        updateInstructorDisplay(activeCurrentSector);
+    };
+
+    function populateFilterDropdowns() {
+        const select = document.getElementById('filterMonthlySector');
+        if(!select) return;
+        select.innerHTML = `<option value="all">-- Tampilkan Semua Sesi / Kompetensi Utuh --</option>`;
+        sectorsMaster.forEach(sec => {
+            select.innerHTML += `<option value="${sec.name}">${sec.name} (${sec.totalJpl} JPL)</option>`;
+        });
+    }
+
+    function calculateRemainingJpl() {
+        let totalCompletedJpl = 0;
+        let currentDate = new Date('2026-08-27');
+        let systemCurrentDate = new Date('2026-08-29');
+        let dayCounter = 1;
+        let sectorIdx = 0;
+        let jplInCurrentSector = 0;
+
+        while(dayCounter <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            if(dayOfWeek === 0) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+            let currentSec = sectorsMaster[sectorIdx];
+            let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
+            let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInCurrentSector = 0;
+            }
+            jplInCurrentSector += jplToday;
+
+            if(currentDate <= systemCurrentDate) {
+                totalCompletedJpl += jplToday;
+            }
+
+            if(jplInCurrentSector >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInCurrentSector = 0;
+            }
+            dayCounter++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        let remaining = 640 - totalCompletedJpl;
+        if(remaining < 0) remaining = 0;
+        const elem = document.getElementById('displayRemainingJpl');
+        if(elem) elem.innerText = `${remaining} JPL`;
+    }
+
+    function generateMasterKurikulumTable() {
+        const tbody = document.getElementById('masterKurikulumTableBody');
+        if(!tbody) return;
+        tbody.innerHTML = "";
+
+        let currentDate = new Date('2026-08-27');
+        let systemCurrentDate = new Date('2026-08-29');
+        let dayCounter = 1;
+        let sectorIdx = 0;
+        let jplInCurrentSector = 0;
+        let cumulativeJpl = 0;
+
+        while(dayCounter <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            let dateString = currentDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            let dayNameStr = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dayOfWeek];
+
+            if(dayOfWeek === 0) {
+                tbody.innerHTML += `
+                    <tr style="background-color: #fef2f2; color: #991b1b; font-weight: bold;">
+                        <td style="text-align:center;">-</td>
+                        <td>${dateString}</td>
+                        <td>${dayNameStr}</td>
+                        <td colspan="5" style="text-align: center; color: #dc2626;">🏖️ HARI MINGGU - LIBUR TOTAL (TIDAK ADA PEMBELAJARAN)</td>
+                    </tr>
+                `;
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+            
+            let currentSec = sectorsMaster[sectorIdx];
+            let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
+            let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
+
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInCurrentSector = 0;
+            }
+
+            jplInCurrentSector += jplToday;
+            cumulativeJpl += jplToday;
+
+            let defaultSecName = currentSec.name;
+            let currentCustomSec = customSectorsStore[`day_${dayCounter}`] || defaultSecName;
+            let subTopicKey = `day_${dayCounter}`;
+            let currentSubVal = subTopicsStore[subTopicKey] || '';
+            let isPastOrToday = currentDate <= systemCurrentDate;
+
+            let sectorOptionsHtml = "";
+            sectorsMaster.forEach(s => {
+                let sel = (s.name === currentCustomSec) ? 'selected' : '';
+                sectorOptionsHtml += `<option value="${s.name}" ${sel}>${s.name}</option>`;
+            });
+
+            let isModifiedModule = (currentCustomSec !== defaultSecName);
+            let jplDisplayStyle = isModifiedModule ? 'color: #dc2626; font-weight: bold; background: #fee2e2;' : 'color: #047857; font-weight: bold;';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td style="text-align:center; font-weight:bold;">${dayCounter}</td>
+                    <td>${dateString}</td>
+                    <td><strong>${dayNameStr}</strong></td>
+                    <td>
+                        <select id="master_sector_${dayCounter}" ${isOperatorUnlocked ? '' : 'disabled'} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isOperatorUnlocked ? '#fff' : '#f8fafc'};" onchange="liveSyncSector(${dayCounter}, this.value)">
+                            ${sectorOptionsHtml}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" id="sub_input_${dayCounter}" value="${currentSubVal}" placeholder="Enter sub-topic..." ${isOperatorUnlocked ? '' : 'disabled'} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isOperatorUnlocked ? '#fff' : '#f8fafc'};" oninput="liveSyncSubTopic(${dayCounter}, this.value)">
+                    </td>
+                    <td style="text-align:center;">
+                        <button type="button" class="btn-save-sub" onclick="saveSingleMasterRow(${dayCounter})" ${isOperatorUnlocked ? '' : 'disabled'}>Save</button>
+                    </td>
+                    <td style="text-align:center; ${jplDisplayStyle}" id="jpl_cell_${dayCounter}" title="${isModifiedModule ? 'Modul diubah oleh operator (menyusut/menyesuaikan alokasi)' : ''}">${jplToday} JPL</td>
+                    <td style="text-align:center;">
+                        ${isPastOrToday ? `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:3px; font-size:0.7rem; font-weight:bold;">CLOSED (${cumulativeJpl} JPL)</span>` : `<span style="color:#059669; font-size:0.75rem; font-weight:bold;">Active (${cumulativeJpl} JPL)</span>`}
+                    </td>
+                </tr>
+            `;
+
+            if(jplInCurrentSector >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInCurrentSector = 0;
+            }
+
+            dayCounter++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        calculateRemainingJpl();
+    }
+
+    function liveSyncSector(dayNum, val) {
+        customSectorsStore[`day_${dayNum}`] = val;
+        localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
+        syncCompletedDaysFromMaster();
+
+        let defaultSecName = getDefaultSectorForDay(dayNum);
+        let jplCell = document.getElementById(`jpl_cell_${dayNum}`);
+        if(jplCell) {
+            if(val !== defaultSecName) {
+                jplCell.style.color = '#dc2626';
+                jplCell.style.fontWeight = 'bold';
+                jplCell.style.backgroundColor = '#fee2e2';
+                jplCell.title = 'Modul diubah oleh operator (menyusut/menyesuaikan alokasi)';
+            } else {
+                jplCell.style.color = '#047857';
+                jplCell.style.fontWeight = 'bold';
+                jplCell.style.backgroundColor = 'transparent';
+                jplCell.title = '';
+            }
+        }
+    }
+
+    function liveSyncSubTopic(dayNum, val) {
+        subTopicsStore[`day_${dayNum}`] = val;
+        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        syncCompletedDaysFromMaster();
+    }
+
+    function saveSingleMasterRow(dayNum) {
+        const sectorElem = document.getElementById(`master_sector_${dayNum}`);
+        const inputElem = document.getElementById(`sub_input_${dayNum}`);
+        if(!sectorElem || !inputElem) return;
+
+        let secVal = sectorElem.value;
+        let subVal = inputElem.value.trim();
+
+        if(!subVal) {
+            alert("Sub-Pokok Bahasan tidak boleh kosong sebelum disimpan!");
+            return;
+        }
+
+        customSectorsStore[`day_${dayNum}`] = secVal;
+        subTopicsStore[`day_${dayNum}`] = subVal;
+        journalLockedStates[`day_${dayNum}`] = true;
+
+        localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        syncCompletedDaysFromMaster();
+
+        alert(`Hari ke-${dayNum} Kompetensi/Modul & Sub-Pokok Bahasan berhasil disubmit dan dikunci permanen di Jurnal KBM!`);
+        generateMasterKurikulumTable();
+        renderJournalTable();
+        buildLiveRoster();
+    }
+
+    function saveAllMasterData() {
+        if(!isOperatorUnlocked) {
+            alert("Buka akses operator terlebih dahulu!");
+            return;
+        }
+
+        let countSaved = 0;
+        let currentDate = new Date('2026-08-27');
+        let dayCounter = 1;
+        let sectorIdx = 0;
+        let jplInCurrentSector = 0;
+
+        while(dayCounter <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            if(dayOfWeek === 0) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+
+            let currentSec = sectorsMaster[sectorIdx];
+            let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
+            let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
+
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInCurrentSector = 0;
+            }
+            jplInCurrentSector += jplToday;
+
+            const sectorElem = document.getElementById(`master_sector_${dayCounter}`);
+            const inputElem = document.getElementById(`sub_input_${dayCounter}`);
+
+            if(sectorElem && inputElem) {
+                customSectorsStore[`day_${dayCounter}`] = sectorElem.value;
+                if(inputElem.value.trim() !== '') {
+                    subTopicsStore[`day_${dayCounter}`] = inputElem.value.trim();
+                }
+                journalLockedStates[`day_${dayCounter}`] = true;
+                countSaved++;
+            }
+
+            if(jplInCurrentSector >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInCurrentSector = 0;
+            }
+            dayCounter++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        syncCompletedDaysFromMaster();
+
+        alert(`${countSaved} Data Kurikulum & Sub-Pokok Bahasan berhasil disimpan dan dikunci permanen di Jurnal KBM!`);
+        generateMasterKurikulumTable();
+        renderJournalTable();
+    }
+
+    function renderJournalTable() {
+        const tbody = document.getElementById('journalTableBody');
+        if(!tbody) return;
+        tbody.innerHTML = "";
+
+        syncCompletedDaysFromMaster();
+
+        const keys = Object.keys(completedDaysStore).sort((a,b) => {
+            return parseInt(a.replace('day_','')) - parseInt(b.replace('day_',''));
+        });
+
+        if(keys.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:15px; color:#64748b; font-size:0.88rem;">Belum ada Jurnal KBM tersimpan.</td></tr>`;
+            return;
+        }
+
+        keys.forEach((k) => {
+            const item = completedDaysStore[k];
+            let dayNum = item.day;
+            let defaultSecName = getDefaultSectorForDay(dayNum);
+            let isModifiedModule = (item.sector !== defaultSecName);
+            let jplDisplayStyle = isModifiedModule ? 'color: #dc2626; font-weight: bold; background: #fee2e2;' : 'color: #dc2626; font-weight: bold;';
+
+            let isLocked = journalLockedStates[k] !== undefined ? journalLockedStates[k] : true;
+
+            if (isLocked) {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align:center; font-weight:bold;">${item.day}</td>
+                        <td>${item.dateStr}</td>
+                        <td><strong>${item.dayName}</strong></td>
+                        <td>${item.sector}</td>
+                        <td>${item.subTopic}</td>
+                        <td style="text-align:center; ${jplDisplayStyle}">${item.jpl} JPL</td>
+                        <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold; display:inline-block;">CLOSED (${item.cumulative} JPL)</span></td>
+                        <td style="text-align:center;">
+                            <button type="button" class="btn-edit-journal" onclick="enableJournalEdit(${dayNum})" ${isOperatorUnlocked ? '' : 'disabled'}>Edit</button>
+                            <button type="button" class="btn-save-journal" onclick="saveJournalEdit('${k}', ${dayNum})" disabled style="opacity:0.5; cursor:not-allowed;">Save</button>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                let sectorOptionsHtml = "";
+                sectorsMaster.forEach(s => {
+                    let sel = (s.name === item.sector) ? 'selected' : '';
+                    sectorOptionsHtml += `<option value="${s.name}" ${sel}>${s.name}</option>`;
+                });
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align:center; font-weight:bold;">${item.day}</td>
+                        <td>${item.dateStr}</td>
+                        <td><strong>${item.dayName}</strong></td>
+                        <td>
+                            <select id="journal_sector_${dayNum}" style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:#fff;">
+                                ${sectorOptionsHtml}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" id="journal_sub_${dayNum}" value="${item.subTopic}" style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:#fff;">
+                        </td>
+                        <td style="text-align:center; ${jplDisplayStyle}">${item.jpl} JPL</td>
+                        <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold; display:inline-block;">EDITING (${item.cumulative} JPL)</span></td>
+                        <td style="text-align:center;">
+                            <button type="button" class="btn-edit-journal" disabled style="opacity:0.5; cursor:not-allowed;">Edit</button>
+                            <button type="button" class="btn-save-journal" onclick="saveJournalEdit('${k}', ${dayNum})">Save</button>
+                        </td>
+                    </tr>
+                `;
+            }
+        });
+    }
+
+    function enableJournalEdit(dayNum) {
+        if(!isOperatorUnlocked) {
+            alert("Buka akses operator terlebih dahulu dengan kata sandi!");
+            return;
+        }
+        journalLockedStates[`day_${dayNum}`] = false;
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        renderJournalTable();
+    }
+
+    function saveJournalEdit(key, dayNum) {
+        if(!isOperatorUnlocked) {
+            alert("Buka akses operator terlebih dahulu!");
+            return;
+        }
+        const inputElem = document.getElementById(`journal_sub_${dayNum}`);
+        const selectElem = document.getElementById(`journal_sector_${dayNum}`);
+        if(!inputElem || !selectElem) return;
+
+        let val = inputElem.value.trim();
+        let secVal = selectElem.value;
+
+        if(!val) {
+            alert("Sub-Pokok Bahasan tidak boleh kosong!");
+            return;
+        }
+
+        subTopicsStore[key] = val;
+        customSectorsStore[key] = secVal;
+        journalLockedStates[key] = true;
+
+        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        syncCompletedDaysFromMaster();
+
+        alert(`Koreksi Jurnal KBM Hari ke-${dayNum} berhasil disimpan dan dikunci permanen!`);
+        renderJournalTable();
+        generateMasterKurikulumTable();
+    }
+
+    function exportJournalToWord() {
+        let tableRowsHtml = "";
+        syncCompletedDaysFromMaster();
+        const keys = Object.keys(completedDaysStore).sort((a,b) => {
+            return parseInt(a.replace('day_','')) - parseInt(b.replace('day_',''));
+        });
+
+        keys.forEach((k) => {
+            const item = completedDaysStore[k];
+            tableRowsHtml += `
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${item.day}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${item.dateStr}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${item.dayName}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${item.sector}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${item.subTopic}</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px; color: #dc2626; font-weight: bold;">${item.jpl} JPL</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px; color: #991b1b; font-weight: bold;">CLOSED (${item.cumulative} JPL)</td>
+                </tr>
+            `;
+        });
+
+        const docContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>Jurnal KBM</title></head>
+            <body style="font-family: Arial, sans-serif;">
+                <h2 style="color: #1e3a8a; text-align: center;">JURNAL KEGIATAN BELAJAR MENGAJAR (KBM)</h2>
+                <h3 style="text-align: center; color: #0d9488;">BP3MI Aceh & Program Peningkatan Kapasitas Calon Pekerja Migran</h3>
+                <p><strong>Instruktur:</strong> <span id="displayInstructor">Giyono Asfarrasyid</span></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-top: 15px;">
+                    <thead>
+                        <tr style="background-color: #f1f5f9; color: #1e3a8a;">
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Hari Ke</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Tanggal</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Hari</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Kompetensi / Modul</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Sub-Pokok Bahasan (in English)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">JPL</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Akumulasi Closed JPL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRowsHtml}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(docContent);
+        const fileDownload = document.createElement('a');
+        document.body.appendChild(fileDownload);
+        fileDownload.href = source;
+        fileDownload.download = 'Jurnal_KBM.doc';
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
+    }
+
+    function exportFullScheduleToWord() {
+        let tableRowsHtml = "";
+        let currentDate = new Date('2026-08-27');
+        let systemCurrentDate = new Date('2026-08-29');
+        let dayCounter = 1;
+        let sectorIdx = 0;
+        let jplInCurrentSector = 0;
+        let cumulativeJpl = 0;
+
+        while(dayCounter <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            let dateString = currentDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            let dayNameStr = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dayOfWeek];
+
+            if(dayOfWeek === 0) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+
+            let currentSec = sectorsMaster[sectorIdx];
+            let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
+            let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
+
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInCurrentSector = 0;
+            }
+
+            jplInCurrentSector += jplToday;
+            cumulativeJpl += jplToday;
+
+            let sectorVal = customSectorsStore[`day_${dayCounter}`] || currentSec.name;
+            const inputElem = document.getElementById(`sub_input_${dayCounter}`);
+            let subVal = inputElem ? inputElem.value : (subTopicsStore[`day_${dayCounter}`] || '');
+            let isPastOrToday = currentDate <= systemCurrentDate;
+            let statusText = isPastOrToday ? `CLOSED (${cumulativeJpl} JPL)` : `Active (${cumulativeJpl} JPL)`;
+
+            tableRowsHtml += `
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${dayCounter}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${dateString}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${dayNameStr}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${sectorVal}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${subVal || '-'}</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px; color: #dc2626; font-weight: bold;">${jplToday} JPL</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${statusText}</td>
+                </tr>
+            `;
+
+            if(jplInCurrentSector >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInCurrentSector = 0;
+            }
+
+            dayCounter++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        const docContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>Jadwal Kurikulum 71 Hari</title></head>
+            <body style="font-family: Arial, sans-serif;">
+                <h2 style="color: #1e3a8a; text-align: center;">JADWAL MASTER KURIKULUM 71 HARI (640 JPL)</h2>
+                <h3 style="text-align: center; color: #0d9488;">BP3MI Aceh & Program Peningkatan Kapasitas Calon Pekerja Migran</h3>
+                <p><strong>Instruktur:</strong> Giyono Asfarrasyid</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-top: 15px;">
+                    <thead>
+                        <tr style="background-color: #f1f5f9; color: #1e3a8a;">
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Hari</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Tanggal</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Hari</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Kompetensi / Modul</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Sub-Pokok Bahasan (in English)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">JPL</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Status / Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRowsHtml}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(docContent);
+        const fileDownload = document.createElement('a');
+        document.body.appendChild(fileDownload);
+        fileDownload.href = source;
+        fileDownload.download = 'Jadwal_Master_Kurikulum_71_Hari.doc';
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
+    }
+
+    function printFullSchedule() {
+        window.print();
+    }
+
+    function unlockOperatorMode() {
+        const inputPwd = prompt("Masukkan Kata Sandi Operator:");
+        if(inputPwd === "Fakinah_1") {
+            isOperatorUnlocked = true;
+            const liveSectorSelect = document.getElementById('liveSector');
+            liveSectorSelect.disabled = false;
+            liveSectorSelect.style.background = '#ffffff';
+
+            document.getElementById('operatorReviewPanel').style.display = 'block';
+            document.getElementById('operatorLockBanner').style.background = '#d1fae5';
+            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Aktif (Kolom Kompetensi/Modul, Sub-Pokok Bahasan & Jurnal Terbuka & Tersinkronisasi Dua Arah)</strong></div>';
+            
+            checkExistingSessionData();
+            updateOperatorReviewStatus();
+            generateMasterKurikulumTable();
+            renderJournalTable();
+            alert("Akses operator dibuka sepenuhnya!");
+        } else if(inputPwd !== null) {
+            alert("Kata sandi salah!");
+        }
+    }
+
+    function checkExistingSessionData() {
+        const currentDate = getCurrentLocalDate();
+        const sectorVal = document.getElementById('liveSector').value;
+        const key = `${currentDate}_${sectorVal}`;
+
+        if(recordedSessions[key]) {
+            const sess = recordedSessions[key];
+            if(sess.students) {
+                Object.keys(sess.students).forEach(idx => {
+                    const log = sess.students[idx];
+                    const chk = document.getElementById(`chk_${idx}`);
+                    if(chk) chk.checked = log.present;
+                });
+            }
+        }
+    }
+
+    function switchView(mode) {
+        document.getElementById('viewLive').classList.remove('active-view');
+        document.getElementById('viewWeekly').classList.remove('active-view');
+        document.getElementById('viewJournal').classList.remove('active-view');
+        document.getElementById('viewMonthly').classList.remove('active-view');
+        document.getElementById('btnLive').classList.remove('active');
+        document.getElementById('btnWeekly').classList.remove('active');
+        document.getElementById('btnJournal').classList.remove('active');
+        document.getElementById('btnMonthly').classList.remove('active');
+
+        if(mode === 'live') {
+            document.getElementById('viewLive').classList.add('active-view');
+            document.getElementById('btnLive').classList.add('active');
+            buildLiveRoster();
+        } else if(mode === 'weekly') {
+            document.getElementById('viewWeekly').classList.add('active-view');
+            document.getElementById('btnWeekly').classList.add('active');
+            generateMasterKurikulumTable();
+        } else if(mode === 'journal') {
+            document.getElementById('viewJournal').classList.add('active-view');
+            document.getElementById('btnJournal').classList.add('active');
+            renderJournalTable();
+        } else {
+            document.getElementById('viewMonthly').classList.add('active-view');
+            document.getElementById('btnMonthly').classList.add('active');
+            renderMonthlyReport();
+        }
+    }
+
+    function buildLiveRoster() {
+        const currentDate = getCurrentLocalDate();
+        document.getElementById('liveDate').value = currentDate;
+
+        const select = document.getElementById('liveSector');
+        select.innerHTML = "";
+        sectorsMaster.forEach(sec => {
+            const opt = document.createElement('option');
+            opt.value = sec.name;
+            opt.text = `${sec.name} (${sec.totalJpl} JPL)`;
+            if(sec.name === activeCurrentSector) opt.selected = true;
+            select.appendChild(opt);
+        });
+        
+        updateInstructorDisplay(activeCurrentSector);
+
+        const tbody = document.getElementById('liveRosterBody');
+        tbody.innerHTML = "";
+
+        students.forEach((name, idx) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td class="student-number">${idx + 1}</td>
+                    <td class="student-name">${name}</td>
+                    <td class="checkbox-center"><input type="checkbox" class="attendance-checkbox" checked id="chk_${idx}"></td>
+                    <td class="sig-cell">
+                        <canvas id="canvas_${idx}" class="individual-canvas"></canvas>
+                        <div style="margin-top:2px;"><button type="button" class="btn-clear-mini" onclick="clearSig(${idx})">Hapus</button></div>
+                    </td>
+                </tr>
+            `;
+        });
+
+        setTimeout(() => {
+            students.forEach((_, idx) => initCanvas(idx));
+            checkExistingSessionData();
+        }, 50);
+    }
+
+    function initCanvas(idx) {
+        const canvas = document.getElementById(`canvas_${idx}`);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = 180;
+        canvas.height = 60;
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1.5;
+
+        let isDrawing = false;
+        canvas.onmousedown = (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+        canvas.onmousemove = (e) => { if(!isDrawing) return; ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); updateOperatorReviewStatus(); };
+        canvas.onmouseup = () => { isDrawing = false; };
+        canvas.onmouseleave = () => { isDrawing = false; };
+
+        canvas.ontouchstart = (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        };
+        canvas.ontouchmove = (e) => {
+            e.preventDefault();
+            if(!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            ctx.stroke();
+            updateOperatorReviewStatus();
+        };
+        canvas.ontouchend = () => { isDrawing = false; };
+    }
+
+    function clearSig(idx) {
+        const canvas = document.getElementById(`canvas_${idx}`);
+        if(canvas) {
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            updateOperatorReviewStatus();
+        }
+    }
+
+    function updateOperatorReviewStatus() {
+        if(!isOperatorUnlocked) return;
+        const grid = document.getElementById('reviewStatusGrid');
+        if(!grid) return;
+        grid.innerHTML = "";
+
+        students.forEach((name, idx) => {
+            const canvas = document.getElementById(`canvas_${idx}`);
+            let isSigned = false;
+            let imgData = "";
+            if(canvas) {
+                const blank = document.createElement('canvas');
+                blank.width = canvas.width;
+                blank.height = canvas.height;
+                if(canvas.toDataURL() !== blank.toDataURL()) {
+                    isSigned = true;
+                    imgData = canvas.toDataURL();
+                }
+            }
+            grid.innerHTML += `
+                <div style="padding:6px; border:1px solid #cbd5e1; border-radius:4px; background:white;">
+                    <div><strong>${idx + 1}. ${name}</strong>: ${isSigned ? '<span style="color:#059669">✔ Tertanda</span>' : '<span style="color:#dc2626">Belum</span>'}</div>
+                    ${imgData ? `<img src="${imgData}" style="max-height:30px; display:block; margin-top:2px;">` : ''}
+                </div>
+            `;
+        });
+    }
+
+    function saveAndRecordSession() {
+        const currentDate = getCurrentLocalDate();
+        const sectorVal = document.getElementById('liveSector').value;
+        const key = `${currentDate}_${sectorVal}`;
+
+        let studentLogs = {};
+        students.forEach((name, idx) => {
+            const chk = document.getElementById(`chk_${idx}`);
+            const canvas = document.getElementById(`canvas_${idx}`);
+            let sigData = "";
+            if(canvas) {
+                const blank = document.createElement('canvas');
+                blank.width = canvas.width;
+                blank.height = canvas.height;
+                if(canvas.toDataURL() !== blank.toDataURL()) {
+                    sigData = canvas.toDataURL();
+                }
+            }
+            studentLogs[idx] = {
+                name: name,
+                present: chk ? chk.checked : true,
+                sig: sigData
+            };
+        });
+
+        const sessionData = {
+            date: currentDate,
+            sectorInfo: sectorVal,
+            timeSlot: "08.00 - 15.30 WIB (9 JPL Strict)",
+            students: studentLogs
+        };
+
+        recordedSessions[key] = sessionData;
+        localStorage.setItem('bp3mi_attendance_cloud_v3', JSON.stringify(recordedSessions));
+
+        const webhookUrl = getWebhookUrl();
+        if(webhookUrl) {
+            fetch(webhookUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(sessionData)
+            }).then(() => {
+                alert("Data presensi berhasil dicatat & sukses terkirim ke Google Sheet arsip!");
+                renderMonthlyReport();
+            }).catch(err => {
+                alert("Presensi tersimpan di perangkat lokal.");
+                renderMonthlyReport();
+            });
+        }
+    }
+
+    function renderMonthlyReport() {
+        const tbody = document.getElementById('monthlyRosterBody');
+        const jnlContainer = document.getElementById('monthlyJournalContainer');
+        const filterSelect = document.getElementById('filterMonthlySector');
+        
+        if(!tbody || !jnlContainer || !filterSelect) return;
+        const selectedFilter = filterSelect.value;
+        
+        tbody.innerHTML = "";
+        jnlContainer.innerHTML = "<h4>📖 Ringkasan Jurnal Sesi Terekam</h4>";
+
+        const keys = Object.keys(recordedSessions).sort().reverse();
+        if(keys.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:15px; color:#64748b;">Belum ada arsip sesi tersimpan.</td></tr>`;
+            jnlContainer.innerHTML += `<p style="font-size:0.85rem; color:#64748b; font-style:italic;">Belum ada jurnal terekam.</p>`;
+            return;
+        }
+
+        let filteredKeys = keys.filter(key => {
+            const sess = recordedSessions[key];
+            if(selectedFilter === 'all') return true;
+            return sess.sectorInfo === selectedFilter;
+        });
+
+        filteredKeys.forEach(key => {
+            const sess = recordedSessions[key];
+            jnlContainer.innerHTML += `
+                <div style="background:#f8fafc; padding:10px; margin-bottom:8px; border-left:4px solid #1e3a8a; border-radius:4px; font-size:0.85rem;">
+                    <strong>📅 Tanggal: ${sess.date} | 📚 Kompetensi: ${sess.sectorInfo} (${sess.timeSlot})</strong>
+                </div>
+            `;
+            
+            let no = 1;
+            Object.values(sess.students).forEach(log => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="student-number">${no++}</td>
+                        <td><strong>${log.name}</strong></td>
+                        <td class="checkbox-center">${log.present ? '<span style="color:#059669; font-weight:bold;">Hadir</span>' : '<span style="color:#dc2626;">Absen</span>'}</td>
+                        <td style="text-align:center;">${log.sig ? `<img src="${log.sig}" style="max-height:40px; display:block; margin:0 auto;">` : '<span style="color:#94a3b8; font-size:0.78rem;">- Belum Tanda Tangan -</span>'}</td>
+                    </tr>
+                `;
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
