@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Master Kurikulum 640 JPL</title>
+    <title>Sistem Master Kurikulum 640 JPL & Recap Nilai</title>
     
     <style>
         :root {
@@ -228,12 +228,31 @@
 
         .student-name {
             font-weight: 600;
-            width: 180px;
+            width: 160px;
+        }
+
+        .phone-input {
+            width: 130px;
+            padding: 5px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .score-input {
+            width: 65px;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #10b981;
+            border-radius: 4px;
+            background: #f0fdf4;
+            color: #065f46;
         }
 
         .checkbox-center {
             text-align: center;
-            width: 70px;
+            width: 60px;
         }
 
         .attendance-checkbox {
@@ -245,7 +264,7 @@
 
         .sig-cell {
             text-align: center;
-            width: 200px;
+            width: 160px;
         }
 
         .individual-canvas {
@@ -254,8 +273,8 @@
             cursor: crosshair;
             display: block;
             margin: 0 auto;
-            width: 180px;
-            height: 60px;
+            width: 150px;
+            height: 50px;
             border-radius: 4px;
             touch-action: none;
         }
@@ -267,6 +286,7 @@
             padding: 2px 5px;
             border-radius: 3px;
             cursor: pointer;
+            font-size: 0.75rem;
         }
 
         .actions {
@@ -378,6 +398,7 @@
 
     <div class="mode-nav">
         <button class="nav-btn active" id="btnLive" onclick="switchView('live')">🔴 Live Presensi & Tanda Tangan</button>
+        <button class="nav-btn" id="btnScoreRecap" onclick="switchView('scoreRecap')">🏆 Recap Nilai & Tanda Tangan Ujian</button>
         <button class="nav-btn" id="btnWeekly" onclick="switchView('weekly')">📅 Master Tabel Kurikulum (Hari 1-71)</button>
         <button class="nav-btn" id="btnJournal" onclick="switchView('journal')">📖 Jurnal KBM & Progress</button>
         <button class="nav-btn" id="btnMonthly" onclick="switchView('monthly')">📊 Monthly Report & Rekap</button>
@@ -386,7 +407,7 @@
     <!-- VIEW 1: LIVE -->
     <div id="viewLive" class="view-section active-view">
         <div class="alert-box">
-            <span>🔒 <strong>Status Hari Ini:</strong> Hari ke-5 (Senin, 31 Agustus 2026). Sesi konsisten 9 JPL per hari.</span>
+            <span>🔒 <strong>Status Hari Ini:</strong> Hari ke-5 (Senin, 31 Agustus 2026). Sesi konsisten 9 JPL per hari. (Sesi yang sudah di-save/closed terkunci permanen).</span>
             <button class="nav-btn" onclick="switchView('weekly')" style="padding: 4px 10px; font-size:0.78rem;">🔍 Lihat Tabel Master Hari 1-71</button>
         </div>
 
@@ -407,22 +428,23 @@
 
         <div id="weekdayContentWrapper">
             <div class="operator-lock-banner" id="operatorLockBanner">
-                <div><strong>🔒 Akses Kontrol:</strong> Masukkan sandi operator untuk mengisi Kompetensi/Modul, Sub-Pokok Bahasan & jurnal harian.</div>
+                <div><strong>🔒 Akses Kontrol:</strong> Masukkan sandi operator untuk membuka/mengubah Kompetensi, Sub-Pokok Bahasan & mencatat presensi riil.</div>
                 <button class="btn-unlock" onclick="unlockOperatorMode()">🔓 Masukkan Sandi Operator</button>
             </div>
 
             <div class="operator-review-panel" id="operatorReviewPanel">
-                <h4>👀 Panel Monitoring Status Tanda Tangan:</h4>
+                <h4>👀 Panel Monitoring Status Tanda Tangan & No HP Peserta:</h4>
                 <div class="review-status-grid" id="reviewStatusGrid"></div>
             </div>
 
-            <h3>Formulir Kehadiran & Tanda Tangan Digital Peserta</h3>
+            <h3>Formulir Kehadiran, Nomor HP & Tanda Tangan Digital Peserta</h3>
 
             <table class="presence-table">
                 <thead>
                     <tr>
                         <th>No</th>
                         <th>Nama Peserta Perawat</th>
+                        <th>No. HP / WhatsApp</th>
                         <th class="checkbox-center">Hadir (✔)</th>
                         <th>Tanda Tangan Digital</th>
                     </tr>
@@ -432,7 +454,44 @@
 
             <div class="actions">
                 <span style="font-size: 0.85rem; color: #166534; font-weight: bold;" id="liveMsg"></span>
-                <button class="btn-export" onclick="saveAndRecordSession()">💾 Simpan & Kirim ke Google Sheet</button>
+                <button class="btn-export" onclick="saveAndRecordSession()">💾 Simpan Permanen & Kirim ke Google Sheet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW NEW: RECAP NILAI & TANDA TANGAN UJIAN PER KOMPETENSI -->
+    <div id="viewScoreRecap" class="view-section">
+        <h3>🏆 Fasilitas "Recap Nilai" Ujian per Kompetensi & Tanda Tangan Peserta</h3>
+        <p style="font-size: 0.88rem; color: #475569;">Fasilitas khusus rekap nilai ujian per kompetensi sesuai Master Kurikulum, lengkap dengan nomor HP, nilai ujian (0-100), dan tanda tangan digital peserta (siap cetak seperti Monthly Report).</p>
+        
+        <div class="filter-report-box">
+            <div style="flex: 1; min-width: 280px;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Pilih Kompetensi / Modul Ujian:</label>
+                <select id="scoreRecapSectorSelect" onchange="renderScoreRecapTable()" style="width: 100%; padding: 7px; border: 1px solid #10b981; border-radius: 4px; font-size: 0.88rem;"></select>
+            </div>
+            <div>
+                <button class="btn-export" onclick="saveScoreRecapData()" style="margin-top: 18px;">💾 Simpan Rekap Nilai Ujian</button>
+            </div>
+        </div>
+
+        <table class="presence-table">
+            <thead>
+                <tr>
+                    <th style="width: 45px;">No</th>
+                    <th>Nama Peserta Perawat</th>
+                    <th style="width: 130px;">No. HP / WhatsApp</th>
+                    <th style="width: 110px;">Nilai Ujian (0-100)</th>
+                    <th>Tanda Tangan Digital Ujian</th>
+                </tr>
+            </thead>
+            <tbody id="scoreRecapRosterBody"></tbody>
+        </table>
+
+        <div class="actions">
+            <span style="font-size: 0.85rem; color: #065f46; font-weight: bold;" id="scoreRecapMsg">Rekap nilai ujian per kompetensi siap dicetak.</span>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-doc" onclick="exportScoreRecapToWord()">📄 Export Recap Nilai ke Doc (Word)</button>
+                <button class="btn-export" onclick="window.print()">🖨️ Print Recap Nilai</button>
             </div>
         </div>
     </div>
@@ -484,7 +543,7 @@
     <!-- VIEW 3: JOURNAL KBM & PROGRESS -->
     <div id="viewJournal" class="view-section">
         <h3>📖 Jurnal KBM & Progress</h3>
-        <p style="font-size: 0.88rem; color: #475569;">Dokumen resmi jurnal capaian belajar dalam penyelesaian kompetensi keperawatan profesional (Tersinkronisasi otomatis dengan Master Tabel secara runtut).</p>
+        <p style="font-size: 0.88rem; color: #475569;">Dokumen resmi jurnal capaian belajar. Sesi yang sudah ditandai 'CLOSED' terkunci permanen; jika operator membuka dan mengedit ulang, perhitungan JPL akan disesuaikan secara dinamis.</p>
         
         <div style="overflow-x: auto; margin-top: 15px; margin-bottom: 20px;">
             <table class="presence-table" style="font-size: 0.82rem;">
@@ -497,7 +556,7 @@
                         <th style="width: 220px;">Sub-Pokok Bahasan (in English)</th>
                         <th style="width: 70px;">JPL</th>
                         <th style="width: 120px;">Akumulasi Closed JPL</th>
-                        <th style="width: 140px;">Aksi Terpisah (Edit / Save)</th>
+                        <th style="width: 140px;">Aksi Operator (Edit / Save)</th>
                     </tr>
                 </thead>
                 <tbody id="journalTableBody"></tbody>
@@ -528,6 +587,7 @@
                 <tr>
                     <th style="width: 40px;">No</th>
                     <th>Nama Peserta Perawat</th>
+                    <th>No. HP / WhatsApp</th>
                     <th class="checkbox-center">Kehadiran</th>
                     <th>Tanda Tangan Digital</th>
                 </tr>
@@ -575,12 +635,14 @@
         { id: "final_sim", name: "9. Integrated Simulation & Final Assessment", totalJpl: 28, cluster: "Integrasi & Portofolio" }
     ];
 
-    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_cloud_v3') || '{}');
-    let subTopicsStore = JSON.parse(localStorage.getItem('bp3mi_subtopics_v3') || '{}');
-    let customSectorsStore = JSON.parse(localStorage.getItem('bp3mi_custom_sectors_v3') || '{}');
-    let completedDaysStore = JSON.parse(localStorage.getItem('bp3mi_completed_days_v3') || '{}');
-    let journalLockedStates = JSON.parse(localStorage.getItem('bp3mi_journal_locks_v3') || '{}');
-    let activeCurrentSector = localStorage.getItem('bp3mi_active_sector_v3') || "1.1 English Basic Pattern";
+    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_cloud_v4') || '{}');
+    let studentPhones = JSON.parse(localStorage.getItem('bp3mi_student_phones_v4') || '{}');
+    let subTopicsStore = JSON.parse(localStorage.getItem('bp3mi_subtopics_v4') || '{}');
+    let customSectorsStore = JSON.parse(localStorage.getItem('bp3mi_custom_sectors_v4') || '{}');
+    let completedDaysStore = JSON.parse(localStorage.getItem('bp3mi_completed_days_v4') || '{}');
+    let journalLockedStates = JSON.parse(localStorage.getItem('bp3mi_journal_locks_v4') || '{}');
+    let scoreRecapStore = JSON.parse(localStorage.getItem('bp3mi_score_recap_v4') || '{}');
+    let activeCurrentSector = localStorage.getItem('bp3mi_active_sector_v4') || "1.1 English Basic Pattern";
     let isOperatorUnlocked = false;
 
     function initDefaultData() {
@@ -592,8 +654,8 @@
         if(journalLockedStates['day_2'] === undefined) journalLockedStates['day_2'] = true;
         if(journalLockedStates['day_3'] === undefined) journalLockedStates['day_3'] = true;
 
-        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
-        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        localStorage.setItem('bp3mi_subtopics_v4', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v4', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
     }
 
@@ -612,7 +674,7 @@
         const liveSectorSelect = document.getElementById('liveSector');
         if(!liveSectorSelect) return;
         activeCurrentSector = liveSectorSelect.value;
-        localStorage.setItem('bp3mi_active_sector_v3', activeCurrentSector);
+        localStorage.setItem('bp3mi_active_sector_v4', activeCurrentSector);
         updateInstructorDisplay(activeCurrentSector);
     }
 
@@ -710,7 +772,7 @@
             dayCounter++;
             currentDate.setDate(currentDate.getDate() + 1);
         }
-        localStorage.setItem('bp3mi_completed_days_v3', JSON.stringify(completedDaysStore));
+        localStorage.setItem('bp3mi_completed_days_v4', JSON.stringify(completedDaysStore));
     }
 
     initDefaultData();
@@ -722,6 +784,8 @@
     window.onload = function() {
         buildLiveRoster();
         populateFilterDropdowns();
+        populateScoreRecapDropdown();
+        renderScoreRecapTable();
         generateMasterKurikulumTable();
         renderJournalTable();
         renderMonthlyReport();
@@ -754,6 +818,15 @@
         });
     }
 
+    function populateScoreRecapDropdown() {
+        const select = document.getElementById('scoreRecapSectorSelect');
+        if(!select) return;
+        select.innerHTML = "";
+        sectorsMaster.forEach(sec => {
+            select.innerHTML += `<option value="${sec.name}">${sec.name} (${sec.cluster})</option>`;
+        });
+    }
+
     function calculateRemainingJpl() {
         let totalCompletedJpl = 0;
         let currentDate = new Date('2026-08-27');
@@ -781,7 +854,10 @@
             jplInCurrentSector += jplToday;
 
             if(currentDate <= systemCurrentDate) {
-                totalCompletedJpl += jplToday;
+                let isLocked = journalLockedStates[`day_${dayCounter}`] !== undefined ? journalLockedStates[`day_${dayCounter}`] : true;
+                if (isLocked) {
+                    totalCompletedJpl += jplToday;
+                }
             }
 
             if(jplInCurrentSector >= currentSec.totalJpl) {
@@ -848,6 +924,7 @@
             let subTopicKey = `day_${dayCounter}`;
             let currentSubVal = subTopicsStore[subTopicKey] || '';
             let isPastOrToday = currentDate <= systemCurrentDate;
+            let isLocked = journalLockedStates[`day_${dayCounter}`] !== undefined ? journalLockedStates[`day_${dayCounter}`] : true;
 
             let sectorOptionsHtml = "";
             sectorsMaster.forEach(s => {
@@ -858,25 +935,27 @@
             let isModifiedModule = (currentCustomSec !== defaultSecName);
             let jplDisplayStyle = isModifiedModule ? 'color: #dc2626; font-weight: bold; background: #fee2e2;' : 'color: #047857; font-weight: bold;';
 
+            let isDisabledField = !isOperatorUnlocked || isLocked;
+
             tbody.innerHTML += `
                 <tr>
                     <td style="text-align:center; font-weight:bold;">${dayCounter}</td>
                     <td>${dateString}</td>
                     <td><strong>${dayNameStr}</strong></td>
                     <td>
-                        <select id="master_sector_${dayCounter}" ${isOperatorUnlocked ? '' : 'disabled'} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isOperatorUnlocked ? '#fff' : '#f8fafc'};" onchange="liveSyncSector(${dayCounter}, this.value)">
+                        <select id="master_sector_${dayCounter}" ${isDisabledField ? 'disabled' : ''} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isDisabledField ? '#f8fafc' : '#fff'};" onchange="liveSyncSector(${dayCounter}, this.value)">
                             ${sectorOptionsHtml}
                         </select>
                     </td>
                     <td>
-                        <input type="text" id="sub_input_${dayCounter}" value="${currentSubVal}" placeholder="Enter sub-topic..." ${isOperatorUnlocked ? '' : 'disabled'} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isOperatorUnlocked ? '#fff' : '#f8fafc'};" oninput="liveSyncSubTopic(${dayCounter}, this.value)">
+                        <input type="text" id="sub_input_${dayCounter}" value="${currentSubVal}" placeholder="Enter sub-topic..." ${isDisabledField ? 'disabled' : ''} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isDisabledField ? '#f8fafc' : '#fff'};" oninput="liveSyncSubTopic(${dayCounter}, this.value)">
                     </td>
                     <td style="text-align:center;">
-                        <button type="button" class="btn-save-sub" onclick="saveSingleMasterRow(${dayCounter})" ${isOperatorUnlocked ? '' : 'disabled'}>Save</button>
+                        <button type="button" class="btn-save-sub" onclick="saveSingleMasterRow(${dayCounter})" ${isDisabledField ? 'disabled' : ''}>Save</button>
                     </td>
-                    <td style="text-align:center; ${jplDisplayStyle}" id="jpl_cell_${dayCounter}" title="${isModifiedModule ? 'Modul diubah oleh operator (menyusut/menyesuaikan alokasi)' : ''}">${jplToday} JPL</td>
+                    <td style="text-align:center; ${jplDisplayStyle}" id="jpl_cell_${dayCounter}">${jplToday} JPL</td>
                     <td style="text-align:center;">
-                        ${isPastOrToday ? `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:3px; font-size:0.7rem; font-weight:bold;">CLOSED (${cumulativeJpl} JPL)</span>` : `<span style="color:#059669; font-size:0.75rem; font-weight:bold;">Active (${cumulativeJpl} JPL)</span>`}
+                        ${isLocked ? `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:3px; font-size:0.7rem; font-weight:bold;">CLOSED</span>` : `<span style="color:#059669; font-size:0.75rem; font-weight:bold;">Editing</span>`}
                     </td>
                 </tr>
             `;
@@ -895,29 +974,13 @@
 
     function liveSyncSector(dayNum, val) {
         customSectorsStore[`day_${dayNum}`] = val;
-        localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_custom_sectors_v4', JSON.stringify(customSectorsStore));
         syncCompletedDaysFromMaster();
-
-        let defaultSecName = getDefaultSectorForDay(dayNum);
-        let jplCell = document.getElementById(`jpl_cell_${dayNum}`);
-        if(jplCell) {
-            if(val !== defaultSecName) {
-                jplCell.style.color = '#dc2626';
-                jplCell.style.fontWeight = 'bold';
-                jplCell.style.backgroundColor = '#fee2e2';
-                jplCell.title = 'Modul diubah oleh operator (menyusut/menyesuaikan alokasi)';
-            } else {
-                jplCell.style.color = '#047857';
-                jplCell.style.fontWeight = 'bold';
-                jplCell.style.backgroundColor = 'transparent';
-                jplCell.title = '';
-            }
-        }
     }
 
     function liveSyncSubTopic(dayNum, val) {
         subTopicsStore[`day_${dayNum}`] = val;
-        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_subtopics_v4', JSON.stringify(subTopicsStore));
         syncCompletedDaysFromMaster();
     }
 
@@ -938,15 +1001,14 @@
         subTopicsStore[`day_${dayNum}`] = subVal;
         journalLockedStates[`day_${dayNum}`] = true;
 
-        localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
-        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
-        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        localStorage.setItem('bp3mi_custom_sectors_v4', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_subtopics_v4', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v4', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
 
-        alert(`Hari ke-${dayNum} Kompetensi/Modul & Sub-Pokok Bahasan berhasil disubmit dan dikunci permanen di Jurnal KBM!`);
+        alert(`Hari ke-${dayNum} berhasil disimpan dan dikunci permanen. Status berubah menjadi CLOSED.`);
         generateMasterKurikulumTable();
         renderJournalTable();
-        buildLiveRoster();
     }
 
     function saveAllMasterData() {
@@ -955,7 +1017,6 @@
             return;
         }
 
-        let countSaved = 0;
         let currentDate = new Date('2026-08-27');
         let dayCounter = 1;
         let sectorIdx = 0;
@@ -984,13 +1045,12 @@
             const sectorElem = document.getElementById(`master_sector_${dayCounter}`);
             const inputElem = document.getElementById(`sub_input_${dayCounter}`);
 
-            if(sectorElem && inputElem) {
+            if(sectorElem && inputElem && !sectorElem.disabled) {
                 customSectorsStore[`day_${dayCounter}`] = sectorElem.value;
                 if(inputElem.value.trim() !== '') {
                     subTopicsStore[`day_${dayCounter}`] = inputElem.value.trim();
                 }
                 journalLockedStates[`day_${dayCounter}`] = true;
-                countSaved++;
             }
 
             if(jplInCurrentSector >= currentSec.totalJpl) {
@@ -1001,12 +1061,12 @@
             currentDate.setDate(currentDate.getDate() + 1);
         }
 
-        localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
-        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
-        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        localStorage.setItem('bp3mi_custom_sectors_v4', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_subtopics_v4', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v4', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
 
-        alert(`${countSaved} Data Kurikulum & Sub-Pokok Bahasan berhasil disimpan dan dikunci permanen di Jurnal KBM!`);
+        alert(`Data master berhasil disimpan dan dikunci permanen! Sesi yang sudah closed tidak akan kembali ke awal.`);
         generateMasterKurikulumTable();
         renderJournalTable();
     }
@@ -1030,11 +1090,8 @@
         keys.forEach((k) => {
             const item = completedDaysStore[k];
             let dayNum = item.day;
-            let defaultSecName = getDefaultSectorForDay(dayNum);
-            let isModifiedModule = (item.sector !== defaultSecName);
-            let jplDisplayStyle = isModifiedModule ? 'color: #dc2626; font-weight: bold; background: #fee2e2;' : 'color: #dc2626; font-weight: bold;';
-
             let isLocked = journalLockedStates[k] !== undefined ? journalLockedStates[k] : true;
+            let jplDisplayStyle = 'color: #dc2626; font-weight: bold;';
 
             if (isLocked) {
                 tbody.innerHTML += `
@@ -1045,10 +1102,10 @@
                         <td>${item.sector}</td>
                         <td>${item.subTopic}</td>
                         <td style="text-align:center; ${jplDisplayStyle}">${item.jpl} JPL</td>
-                        <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold; display:inline-block;">CLOSED (${item.cumulative} JPL)</span></td>
+                        <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold;">CLOSED (${item.cumulative} JPL)</span></td>
                         <td style="text-align:center;">
                             <button type="button" class="btn-edit-journal" onclick="enableJournalEdit(${dayNum})" ${isOperatorUnlocked ? '' : 'disabled'}>Edit</button>
-                            <button type="button" class="btn-save-journal" onclick="saveJournalEdit('${k}', ${dayNum})" disabled style="opacity:0.5; cursor:not-allowed;">Save</button>
+                            <button type="button" class="btn-save-journal" disabled style="opacity:0.4; cursor:not-allowed;">Save</button>
                         </td>
                     </tr>
                 `;
@@ -1073,15 +1130,16 @@
                             <input type="text" id="journal_sub_${dayNum}" value="${item.subTopic}" style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:#fff;">
                         </td>
                         <td style="text-align:center; ${jplDisplayStyle}">${item.jpl} JPL</td>
-                        <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold; display:inline-block;">EDITING (${item.cumulative} JPL)</span></td>
+                        <td style="text-align:center;"><span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold;">EDITING (Mengurangi/Menyesuaikan JPL)</span></td>
                         <td style="text-align:center;">
-                            <button type="button" class="btn-edit-journal" disabled style="opacity:0.5; cursor:not-allowed;">Edit</button>
+                            <button type="button" class="btn-edit-journal" disabled style="opacity:0.4; cursor:not-allowed;">Edit</button>
                             <button type="button" class="btn-save-journal" onclick="saveJournalEdit('${k}', ${dayNum})">Save</button>
                         </td>
                     </tr>
                 `;
             }
         });
+        calculateRemainingJpl();
     }
 
     function enableJournalEdit(dayNum) {
@@ -1090,8 +1148,9 @@
             return;
         }
         journalLockedStates[`day_${dayNum}`] = false;
-        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        localStorage.setItem('bp3mi_journal_locks_v4', JSON.stringify(journalLockedStates));
         renderJournalTable();
+        generateMasterKurikulumTable();
     }
 
     function saveJournalEdit(key, dayNum) {
@@ -1115,14 +1174,213 @@
         customSectorsStore[key] = secVal;
         journalLockedStates[key] = true;
 
-        localStorage.setItem('bp3mi_subtopics_v3', JSON.stringify(subTopicsStore));
-        localStorage.setItem('bp3mi_custom_sectors_v3', JSON.stringify(customSectorsStore));
-        localStorage.setItem('bp3mi_journal_locks_v3', JSON.stringify(journalLockedStates));
+        localStorage.setItem('bp3mi_subtopics_v4', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_custom_sectors_v4', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_journal_locks_v4', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
 
-        alert(`Koreksi Jurnal KBM Hari ke-${dayNum} berhasil disimpan dan dikunci permanen!`);
+        alert(`Koreksi Jurnal KBM Hari ke-${dayNum} berhasil disimpan, dikunci permanen, dan akumulasi JPL diperbarui!`);
         renderJournalTable();
         generateMasterKurikulumTable();
+    }
+
+    function renderScoreRecapTable() {
+        const select = document.getElementById('scoreRecapSectorSelect');
+        const tbody = document.getElementById('scoreRecapRosterBody');
+        if(!select || !tbody) return;
+
+        const currentSec = select.value;
+        tbody.innerHTML = "";
+
+        if(!scoreRecapStore[currentSec]) {
+            scoreRecapStore[currentSec] = {};
+        }
+
+        students.forEach((name, idx) => {
+            let studentData = scoreRecapStore[currentSec][idx] || { score: '', sig: '' };
+            let phoneVal = studentPhones[idx] || '';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td class="student-number">${idx + 1}</td>
+                    <td class="student-name">${name}</td>
+                    <td><input type="text" class="phone-input" value="${phoneVal}" readonly style="background:#f8fafc;"></td>
+                    <td style="text-align:center;">
+                        <input type="number" min="0" max="100" class="score-input" id="score_${currentSec}_${idx}" value="${studentData.score}" placeholder="0-100" oninput="saveSingleScore('${currentSec}', ${idx}, this.value)">
+                    </td>
+                    <td class="sig-cell">
+                        <canvas id="score_canvas_${currentSec}_${idx}" class="individual-canvas"></canvas>
+                        <div style="margin-top:2px;"><button type="button" class="btn-clear-mini" onclick="clearScoreSig('${currentSec}', ${idx})">Hapus</button></div>
+                    </td>
+                </tr>
+            `;
+        });
+
+        setTimeout(() => {
+            students.forEach((_, idx) => initScoreCanvas(currentSec, idx));
+        }, 50);
+    }
+
+    function initScoreCanvas(sectorName, idx) {
+        const canvas = document.getElementById(`score_canvas_${sectorName}_${idx}`);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = 150;
+        canvas.height = 50;
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1.5;
+
+        if(!scoreRecapStore[sectorName]) scoreRecapStore[sectorName] = {};
+        if(!scoreRecapStore[sectorName][idx]) scoreRecapStore[sectorName][idx] = { score: '', sig: '' };
+
+        if(scoreRecapStore[sectorName][idx].sig) {
+            let img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = scoreRecapStore[sectorName][idx].sig;
+        }
+
+        let isDrawing = false;
+
+        function getCoordinates(e, canvasElem) {
+            const rect = canvasElem.getBoundingClientRect();
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        canvas.onmousedown = (e) => {
+            isDrawing = true;
+            const pos = getCoordinates(e, canvas);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        };
+        canvas.onmousemove = (e) => {
+            if(!isDrawing) return;
+            const pos = getCoordinates(e, canvas);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            scoreRecapStore[sectorName][idx].sig = canvas.toDataURL();
+            localStorage.setItem('bp3mi_score_recap_v4', JSON.stringify(scoreRecapStore));
+        };
+        canvas.onmouseup = () => { isDrawing = false; };
+        canvas.onmouseleave = () => { isDrawing = false; };
+
+        canvas.ontouchstart = (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getCoordinates(e, canvas);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        };
+        canvas.ontouchmove = (e) => {
+            e.preventDefault();
+            if(!isDrawing) return;
+            const pos = getCoordinates(e, canvas);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            scoreRecapStore[sectorName][idx].sig = canvas.toDataURL();
+            localStorage.setItem('bp3mi_score_recap_v4', JSON.stringify(scoreRecapStore));
+        };
+        canvas.ontouchend = () => { isDrawing = false; };
+    }
+
+    function saveSingleScore(sectorName, idx, val) {
+        if(!scoreRecapStore[sectorName]) scoreRecapStore[sectorName] = {};
+        if(!scoreRecapStore[sectorName][idx]) scoreRecapStore[sectorName][idx] = { score: '', sig: '' };
+        scoreRecapStore[sectorName][idx].score = val;
+        localStorage.setItem('bp3mi_score_recap_v4', JSON.stringify(scoreRecapStore));
+    }
+
+    function clearScoreSig(sectorName, idx) {
+        const canvas = document.getElementById(`score_canvas_${sectorName}_${idx}`);
+        if(canvas) {
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            if(scoreRecapStore[sectorName] && scoreRecapStore[sectorName][idx]) {
+                scoreRecapStore[sectorName][idx].sig = "";
+                localStorage.setItem('bp3mi_score_recap_v4', JSON.stringify(scoreRecapStore));
+            }
+        }
+    }
+
+    function saveScoreRecapData() {
+        const select = document.getElementById('scoreRecapSectorSelect');
+        if(!select) return;
+        const currentSec = select.value;
+
+        students.forEach((_, idx) => {
+            const scoreInput = document.getElementById(`score_${currentSec}_${idx}`);
+            if(scoreInput) {
+                if(!scoreRecapStore[currentSec]) scoreRecapStore[currentSec] = {};
+                if(!scoreRecapStore[currentSec][idx]) scoreRecapStore[currentSec][idx] = { score: '', sig: '' };
+                scoreRecapStore[currentSec][idx].score = scoreInput.value;
+            }
+        });
+
+        localStorage.setItem('bp3mi_score_recap_v4', JSON.stringify(scoreRecapStore));
+        alert(`Rekap nilai ujian untuk kompetensi "${currentSec}" berhasil disimpan!`);
+    }
+
+    function exportScoreRecapToWord() {
+        const select = document.getElementById('scoreRecapSectorSelect');
+        const currentSec = select ? select.value : "Kompetensi";
+        let tableRowsHtml = "";
+
+        students.forEach((name, idx) => {
+            let sData = (scoreRecapStore[currentSec] && scoreRecapStore[currentSec][idx]) ? scoreRecapStore[currentSec][idx] : { score: '-', sig: '' };
+            let phoneVal = studentPhones[idx] || '-';
+            let sigImg = sData.sig ? `<img src="${sData.sig}" style="max-height:35px;" />` : '-';
+
+            tableRowsHtml += `
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${idx + 1}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${name}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 6px;">${phoneVal}</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px; font-weight: bold; color: #065f46;">${sData.score || '-'}</td>
+                    <td style="border: 1px solid #cbd5e1; text-align: center; padding: 6px;">${sigImg}</td>
+                </tr>
+            `;
+        });
+
+        const docContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>Recap Nilai Ujian</title></head>
+            <body style="font-family: Arial, sans-serif;">
+                <h2 style="color: #1e3a8a; text-align: center;">REKAP NILAI UJIAN & TANDA TANGAN PESERTA</h2>
+                <h3 style="text-align: center; color: #0d9488;">Kompetensi / Modul: ${currentSec}</h3>
+                <p><strong>Program:</strong> Master Kurikulum 640 JPL | BP3MI Aceh</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-top: 15px;">
+                    <thead>
+                        <tr style="background-color: #f1f5f9; color: #1e3a8a;">
+                            <th style="border: 1px solid #cbd5e1; padding: 8px; width: 40px;">No</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px;">Nama Peserta Perawat</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px; width: 120px;">No. HP / WhatsApp</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px; width: 90px;">Nilai Ujian</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 8px; width: 150px;">Tanda Tangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRowsHtml}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(docContent);
+        const fileDownload = document.createElement('a');
+        document.body.appendChild(fileDownload);
+        fileDownload.href = source;
+        fileDownload.download = `Recap_Nilai_${currentSec.replace(/[^a-zA-Z0-9]/g, '_')}.doc`;
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
     }
 
     function exportJournalToWord() {
@@ -1153,7 +1411,7 @@
             <body style="font-family: Arial, sans-serif;">
                 <h2 style="color: #1e3a8a; text-align: center;">JURNAL KEGIATAN BELAJAR MENGAJAR (KBM)</h2>
                 <h3 style="text-align: center; color: #0d9488;">BP3MI Aceh & Program Peningkatan Kapasitas Calon Pekerja Migran</h3>
-                <p><strong>Instruktur:</strong> <span id="displayInstructor">Giyono Asfarrasyid</span></p>
+                <p><strong>Instruktur:</strong> Giyono Asfarrasyid</p>
                 <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-top: 15px;">
                     <thead>
                         <tr style="background-color: #f1f5f9; color: #1e3a8a;">
@@ -1218,10 +1476,10 @@
             cumulativeJpl += jplToday;
 
             let sectorVal = customSectorsStore[`day_${dayCounter}`] || currentSec.name;
-            const inputElem = document.getElementById(`sub_input_${dayCounter}`);
-            let subVal = inputElem ? inputElem.value : (subTopicsStore[`day_${dayCounter}`] || '');
+            let subVal = subTopicsStore[`day_${dayCounter}`] || '';
             let isPastOrToday = currentDate <= systemCurrentDate;
-            let statusText = isPastOrToday ? `CLOSED (${cumulativeJpl} JPL)` : `Active (${cumulativeJpl} JPL)`;
+            let isLocked = journalLockedStates[`day_${dayCounter}`] !== undefined ? journalLockedStates[`day_${dayCounter}`] : true;
+            let statusText = isPastOrToday && isLocked ? `CLOSED (${cumulativeJpl} JPL)` : `Active (${cumulativeJpl} JPL)`;
 
             tableRowsHtml += `
                 <tr>
@@ -1294,7 +1552,7 @@
 
             document.getElementById('operatorReviewPanel').style.display = 'block';
             document.getElementById('operatorLockBanner').style.background = '#d1fae5';
-            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Aktif (Kolom Kompetensi/Modul, Sub-Pokok Bahasan & Jurnal Terbuka & Tersinkronisasi Dua Arah)</strong></div>';
+            document.getElementById('operatorLockBanner').innerHTML = '<div><strong>✅ Akses Operator Aktif (Kolom No. HP, Tanda Tangan & Jurnal Terbuka)</strong></div>';
             
             checkExistingSessionData();
             updateOperatorReviewStatus();
@@ -1318,6 +1576,8 @@
                     const log = sess.students[idx];
                     const chk = document.getElementById(`chk_${idx}`);
                     if(chk) chk.checked = log.present;
+                    const phoneInput = document.getElementById(`phone_${idx}`);
+                    if(phoneInput && log.phone) phoneInput.value = log.phone;
                 });
             }
         }
@@ -1325,10 +1585,13 @@
 
     function switchView(mode) {
         document.getElementById('viewLive').classList.remove('active-view');
+        document.getElementById('viewScoreRecap').classList.remove('active-view');
         document.getElementById('viewWeekly').classList.remove('active-view');
         document.getElementById('viewJournal').classList.remove('active-view');
         document.getElementById('viewMonthly').classList.remove('active-view');
+        
         document.getElementById('btnLive').classList.remove('active');
+        document.getElementById('btnScoreRecap').classList.remove('active');
         document.getElementById('btnWeekly').classList.remove('active');
         document.getElementById('btnJournal').classList.remove('active');
         document.getElementById('btnMonthly').classList.remove('active');
@@ -1337,6 +1600,10 @@
             document.getElementById('viewLive').classList.add('active-view');
             document.getElementById('btnLive').classList.add('active');
             buildLiveRoster();
+        } else if(mode === 'scoreRecap') {
+            document.getElementById('viewScoreRecap').classList.add('active-view');
+            document.getElementById('btnScoreRecap').classList.add('active');
+            renderScoreRecapTable();
         } else if(mode === 'weekly') {
             document.getElementById('viewWeekly').classList.add('active-view');
             document.getElementById('btnWeekly').classList.add('active');
@@ -1369,10 +1636,14 @@
         tbody.innerHTML = "";
 
         students.forEach((name, idx) => {
+            let savedPhone = studentPhones[idx] || '';
             tbody.innerHTML += `
                 <tr>
                     <td class="student-number">${idx + 1}</td>
                     <td class="student-name">${name}</td>
+                    <td>
+                        <input type="text" class="phone-input" id="phone_${idx}" value="${savedPhone}" placeholder="08xx..." oninput="saveStudentPhone(${idx}, this.value)">
+                    </td>
                     <td class="checkbox-center"><input type="checkbox" class="attendance-checkbox" checked id="chk_${idx}"></td>
                     <td class="sig-cell">
                         <canvas id="canvas_${idx}" class="individual-canvas"></canvas>
@@ -1388,18 +1659,23 @@
         }, 50);
     }
 
+    function saveStudentPhone(idx, phoneVal) {
+        studentPhones[idx] = phoneVal.trim();
+        localStorage.setItem('bp3mi_student_phones_v4', JSON.stringify(studentPhones));
+        updateOperatorReviewStatus();
+    }
+
     function initCanvas(idx) {
         const canvas = document.getElementById(`canvas_${idx}`);
         if(!canvas) return;
         const ctx = canvas.getContext('2d');
-        canvas.width = 180;
-        canvas.height = 60;
+        canvas.width = 150;
+        canvas.height = 50;
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 1.5;
 
         let isDrawing = false;
         
-        // Memperbaiki fungsi koordinat agar akurat baik untuk Mouse maupun Touch screen (HP/Tablet)
         function getCoordinates(e, canvasElem) {
             const rect = canvasElem.getBoundingClientRect();
             let clientX, clientY;
@@ -1470,6 +1746,7 @@
 
         students.forEach((name, idx) => {
             const canvas = document.getElementById(`canvas_${idx}`);
+            const phoneVal = document.getElementById(`phone_${idx}`) ? document.getElementById(`phone_${idx}`).value : (studentPhones[idx] || '-');
             let isSigned = false;
             let imgData = "";
             if(canvas) {
@@ -1483,8 +1760,10 @@
             }
             grid.innerHTML += `
                 <div style="padding:6px; border:1px solid #cbd5e1; border-radius:4px; background:white;">
-                    <div><strong>${idx + 1}. ${name}</strong>: ${isSigned ? '<span style="color:#059669">✔ Tertanda</span>' : '<span style="color:#dc2626">Belum</span>'}</div>
-                    ${imgData ? `<img src="${imgData}" style="max-height:30px; display:block; margin-top:2px;">` : ''}
+                    <div><strong>${idx + 1}. ${name}</strong></div>
+                    <div style="font-size:0.75rem; color:#475569;">📞 HP: ${phoneVal || 'Belum diisi'}</div>
+                    <div style="font-size:0.75rem;">Tanda Tangan: ${isSigned ? '<span style="color:#059669">✔ Tertanda</span>' : '<span style="color:#dc2626">Belum</span>'}</div>
+                    ${imgData ? `<img src="${imgData}" style="max-height:25px; display:block; margin-top:2px;">` : ''}
                 </div>
             `;
         });
@@ -1498,6 +1777,7 @@
         let studentLogs = {};
         students.forEach((name, idx) => {
             const chk = document.getElementById(`chk_${idx}`);
+            const phoneInput = document.getElementById(`phone_${idx}`);
             const canvas = document.getElementById(`canvas_${idx}`);
             let sigData = "";
             if(canvas) {
@@ -1508,12 +1788,18 @@
                     sigData = canvas.toDataURL();
                 }
             }
+            let phoneVal = phoneInput ? phoneInput.value.trim() : (studentPhones[idx] || '');
+            studentPhones[idx] = phoneVal;
+
             studentLogs[idx] = {
                 name: name,
+                phone: phoneVal,
                 present: chk ? chk.checked : true,
                 sig: sigData
             };
         });
+
+        localStorage.setItem('bp3mi_student_phones_v4', JSON.stringify(studentPhones));
 
         const sessionData = {
             date: currentDate,
@@ -1523,7 +1809,7 @@
         };
 
         recordedSessions[key] = sessionData;
-        localStorage.setItem('bp3mi_attendance_cloud_v3', JSON.stringify(recordedSessions));
+        localStorage.setItem('bp3mi_attendance_cloud_v4', JSON.stringify(recordedSessions));
 
         const webhookUrl = getWebhookUrl();
         if(webhookUrl) {
@@ -1533,10 +1819,10 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(sessionData)
             }).then(() => {
-                alert("Data presensi berhasil dicatat & sukses terkirim ke Google Sheet arsip!");
+                alert("Data presensi, nomor HP, & tanda tangan berhasil disimpan permanen & terkirim ke Google Sheet arsip!");
                 renderMonthlyReport();
             }).catch(err => {
-                alert("Presensi tersimpan di perangkat lokal.");
+                alert("Presensi & tanda tangan riil tersimpan di perangkat lokal.");
                 renderMonthlyReport();
             });
         }
@@ -1555,7 +1841,7 @@
 
         const keys = Object.keys(recordedSessions).sort().reverse();
         if(keys.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:15px; color:#64748b;">Belum ada arsip sesi tersimpan.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:15px; color:#64748b;">Belum ada arsip sesi tersimpan.</td></tr>`;
             jnlContainer.innerHTML += `<p style="font-size:0.85rem; color:#64748b; font-style:italic;">Belum ada jurnal terekam.</p>`;
             return;
         }
@@ -1580,6 +1866,7 @@
                     <tr>
                         <td class="student-number">${no++}</td>
                         <td><strong>${log.name}</strong></td>
+                        <td>${log.phone || '-'}</td>
                         <td class="checkbox-center">${log.present ? '<span style="color:#059669; font-weight:bold;">Hadir</span>' : '<span style="color:#dc2626;">Absen</span>'}</td>
                         <td style="text-align:center;">${log.sig ? `<img src="${log.sig}" style="max-height:40px; display:block; margin:0 auto;">` : '<span style="color:#94a3b8; font-size:0.78rem;">- Belum Tanda Tangan -</span>'}</td>
                     </tr>
