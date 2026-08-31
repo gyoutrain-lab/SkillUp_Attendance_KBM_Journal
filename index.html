@@ -386,14 +386,14 @@
     <!-- VIEW 1: LIVE -->
     <div id="viewLive" class="view-section active-view">
         <div class="alert-box">
-            <span>🔒 <strong>Status Hari Ini:</strong> Hari ke-3 (Sabtu, 29 Agustus 2026). Sesi konsisten 9 JPL per hari.</span>
+            <span>🔒 <strong>Status Hari Ini:</strong> Hari ke-5 (Senin, 31 Agustus 2026). Sesi konsisten 9 JPL per hari.</span>
             <button class="nav-btn" onclick="switchView('weekly')" style="padding: 4px 10px; font-size:0.78rem;">🔍 Lihat Tabel Master Hari 1-71</button>
         </div>
 
         <div class="session-control-box">
             <div class="control-group">
-                <label>Tanggal Sistem (Live):</label>
-                <input type="date" id="liveDate" readonly style="background:#e2e8f0; font-weight:bold;">
+                <label>Tanggal & Waktu Sistem (Live):</label>
+                <input type="text" id="liveDate" readonly style="background:#e2e8f0; font-weight:bold; color:#1e3a8a;">
             </div>
             <div class="control-group">
                 <label>Kompetensi Sesuai Alokasi:</label>
@@ -597,12 +597,10 @@
         syncCompletedDaysFromMaster();
     }
 
-    // Fungsi Pengatur Instruktur Berdasarkan Modul 4.1, 4.2, 4.3
     function updateInstructorDisplay(sectorName) {
         const instructorSpan = document.getElementById('displayInstructor');
         if (!instructorSpan) return;
         
-        // Cek apakah modul mencakup 4.1, 4.2, atau 4.3
         if (sectorName.startsWith("4.1") || sectorName.startsWith("4.2") || sectorName.startsWith("4.3")) {
             instructorSpan.innerText = "Rizkia Funna";
         } else {
@@ -659,7 +657,7 @@
     function syncCompletedDaysFromMaster() {
         completedDaysStore = {};
         let currentDate = new Date('2026-08-27');
-        let systemCurrentDate = new Date('2026-08-29');
+        let systemCurrentDate = new Date();
         let dayCounter = 1;
         let sectorIdx = 0;
         let jplInCurrentSector = 0;
@@ -717,10 +715,6 @@
 
     initDefaultData();
 
-    function getCurrentLocalDate() {
-        return "2026-08-29";
-    }
-
     function getWebhookUrl() {
         return document.getElementById('cloudWebhookUrl').value;
     }
@@ -732,7 +726,24 @@
         renderJournalTable();
         renderMonthlyReport();
         updateInstructorDisplay(activeCurrentSector);
+        startLiveSystemClock();
     };
+
+    function startLiveSystemClock() {
+        const liveDateInput = document.getElementById('liveDate');
+        if (!liveDateInput) return;
+
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('id-ID', options);
+            const timeStr = now.toLocaleTimeString('id-ID');
+            liveDateInput.value = `${dateStr} - ${timeStr} WIB`;
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    }
 
     function populateFilterDropdowns() {
         const select = document.getElementById('filterMonthlySector');
@@ -746,7 +757,7 @@
     function calculateRemainingJpl() {
         let totalCompletedJpl = 0;
         let currentDate = new Date('2026-08-27');
-        let systemCurrentDate = new Date('2026-08-29');
+        let systemCurrentDate = new Date();
         let dayCounter = 1;
         let sectorIdx = 0;
         let jplInCurrentSector = 0;
@@ -793,7 +804,7 @@
         tbody.innerHTML = "";
 
         let currentDate = new Date('2026-08-27');
-        let systemCurrentDate = new Date('2026-08-29');
+        let systemCurrentDate = new Date();
         let dayCounter = 1;
         let sectorIdx = 0;
         let jplInCurrentSector = 0;
@@ -1175,7 +1186,7 @@
     function exportFullScheduleToWord() {
         let tableRowsHtml = "";
         let currentDate = new Date('2026-08-27');
-        let systemCurrentDate = new Date('2026-08-29');
+        let systemCurrentDate = new Date();
         let dayCounter = 1;
         let sectorIdx = 0;
         let jplInCurrentSector = 0;
@@ -1296,7 +1307,7 @@
     }
 
     function checkExistingSessionData() {
-        const currentDate = getCurrentLocalDate();
+        const currentDate = new Date().toISOString().split('T')[0];
         const sectorVal = document.getElementById('liveSector').value;
         const key = `${currentDate}_${sectorVal}`;
 
@@ -1342,9 +1353,6 @@
     }
 
     function buildLiveRoster() {
-        const currentDate = getCurrentLocalDate();
-        document.getElementById('liveDate').value = currentDate;
-
         const select = document.getElementById('liveSector');
         select.innerHTML = "";
         sectorsMaster.forEach(sec => {
@@ -1390,28 +1398,59 @@
         ctx.lineWidth = 1.5;
 
         let isDrawing = false;
-        canvas.onmousedown = (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
-        canvas.onmousemove = (e) => { if(!isDrawing) return; ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); updateOperatorReviewStatus(); };
+        
+        // Memperbaiki fungsi koordinat agar akurat baik untuk Mouse maupun Touch screen (HP/Tablet)
+        function getCoordinates(e, canvasElem) {
+            const rect = canvasElem.getBoundingClientRect();
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        canvas.onmousedown = (e) => {
+            isDrawing = true;
+            const pos = getCoordinates(e, canvas);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        };
+        
+        canvas.onmousemove = (e) => {
+            if(!isDrawing) return;
+            const pos = getCoordinates(e, canvas);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            updateOperatorReviewStatus();
+        };
+        
         canvas.onmouseup = () => { isDrawing = false; };
         canvas.onmouseleave = () => { isDrawing = false; };
 
         canvas.ontouchstart = (e) => {
             e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
             isDrawing = true;
+            const pos = getCoordinates(e, canvas);
             ctx.beginPath();
-            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            ctx.moveTo(pos.x, pos.y);
         };
+        
         canvas.ontouchmove = (e) => {
             e.preventDefault();
             if(!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            const pos = getCoordinates(e, canvas);
+            ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
             updateOperatorReviewStatus();
         };
+        
         canvas.ontouchend = () => { isDrawing = false; };
     }
 
@@ -1452,7 +1491,7 @@
     }
 
     function saveAndRecordSession() {
-        const currentDate = getCurrentLocalDate();
+        const currentDate = new Date().toISOString().split('T')[0];
         const sectorVal = document.getElementById('liveSector').value;
         const key = `${currentDate}_${sectorVal}`;
 
