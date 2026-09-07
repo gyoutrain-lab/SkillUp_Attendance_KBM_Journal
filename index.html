@@ -691,7 +691,7 @@
         if (!instructorSpan) return;
         
         if (sectorName.startsWith("4.1") || sectorName.startsWith("4.2") || sectorName.startsWith("4.3")) {
-            instructorSpan.innerText = "Maria Ulfa";
+            instructorSpan.innerText = "Rizkia Funna";
         } else {
             instructorSpan.innerText = "Giyono Asfarrasyid";
         }
@@ -900,7 +900,6 @@
 
         let currentDate = new Date('2026-08-27');
         let systemCurrentDate = new Date();
-        // Normalisasi jam ke 00:00:00 untuk perbandingan akurat berbasis kalendar
         systemCurrentDate.setHours(0,0,0,0);
 
         let dayCounter = 1;
@@ -944,7 +943,6 @@
             jplInCurrentSector += jplToday;
             cumulativeJpl += jplToday;
 
-            // Logika Status Otomatis: Jika tanggal baris < tanggal hari ini -> CLOSED, jika >= tanggal hari ini -> LIVE
             let isPastDate = cellDateNormalized < systemCurrentDate;
             let statusBadge = isPastDate 
                 ? `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:3px; font-size:0.7rem; font-weight:bold;">CLOSED (<strong>${cumulativeJpl} JPL</strong>)</span>` 
@@ -954,7 +952,6 @@
             let currentCustomSec = customSectorsStore[`day_${dayCounter}`] || defaultSecName;
             let subTopicKey = `day_${dayCounter}`;
             let currentSubVal = subTopicsStore[subTopicKey] || '';
-            let isLocked = journalLockedStates[`day_${dayCounter}`] !== undefined ? journalLockedStates[`day_${dayCounter}`] : true;
 
             let sectorOptionsHtml = "";
             sectorsMaster.forEach(s => {
@@ -964,7 +961,9 @@
 
             let isModifiedModule = (currentCustomSec !== defaultSecName);
             let jplDisplayStyle = isModifiedModule ? 'color: #dc2626; font-weight: bold; background: #fee2e2;' : 'color: #047857; font-weight: bold;';
-            let isDisabledField = !isOperatorUnlocked || (isLocked && isPastDate);
+            
+            // PERBAIKAN: Input akan terbuka bebas saat Mode Operator Diaktifkan
+            let isDisabledField = !isOperatorUnlocked;
 
             tbody.innerHTML += `
                 <tr>
@@ -1201,7 +1200,6 @@
         generateMasterKurikulumTable();
     }
 
-    // --- REBUILT INDIVIDUAL SIGNATURE & PHONE PERSISTENCE SYSTEM ---
     function buildLiveRoster() {
         const select = document.getElementById('liveSector');
         select.innerHTML = "";
@@ -1310,7 +1308,6 @@
         alert(`Tanda tangan peserta nomor ${idx + 1} dikosongkan.`);
     }
 
-    // --- SCORE RECAP SECTION WITH INDIVIDUAL SIGNATURE ---
     function renderScoreRecapTable() {
         const select = document.getElementById('scoreRecapSectorSelect');
         const tbody = document.getElementById('scoreRecapRosterBody');
