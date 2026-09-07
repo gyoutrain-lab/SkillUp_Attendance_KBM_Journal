@@ -961,8 +961,6 @@
 
             let isModifiedModule = (currentCustomSec !== defaultSecName);
             let jplDisplayStyle = isModifiedModule ? 'color: #dc2626; font-weight: bold; background: #fee2e2;' : 'color: #047857; font-weight: bold;';
-            
-            // PERBAIKAN: Input akan terbuka bebas saat Mode Operator Diaktifkan
             let isDisabledField = !isOperatorUnlocked;
 
             tbody.innerHTML += `
@@ -1567,15 +1565,216 @@
         });
     }
 
+    // FUNGSI UTAMA PENANGAN EKSPOR DOKUMEN WORD (.DOC) LENGKAP BERSAMA TANDA TANGAN
+    function downloadWordDocument(filename, contentHtml) {
+        const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+            "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+            "xmlns='http://www.w3.org/TR/REC-html40'>" +
+            "<head><meta charset='utf-8'><title>Export Document</title>" +
+            "<style>" +
+            "body { font-family: Arial, sans-serif; font-size: 11pt; }" +
+            "table { border-collapse: collapse; width: 100%; margin-top: 15px; }" +
+            "th, td { border: 1px solid #000; padding: 6px 8px; vertical-align: middle; text-align: left; }" +
+            "th { background-color: #f2f2f2; font-weight: bold; text-align: center; }" +
+            "h2, h3 { color: #1e3a8a; margin-bottom: 5px; }" +
+            "</style></head><body>";
+        const footer = "</body></html>";
+        const sourceHTML = header + contentHtml + footer;
+
+        const blob = new Blob(['\ufeff', sourceHTML], {
+            type: 'application/msword'
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     function exportScoreRecapToWord() {
-        alert("File dokumen Word rekap nilai ujian siap diunduh.");
+        const select = document.getElementById('scoreRecapSectorSelect');
+        if(!select) return;
+        const currentSec = select.value;
+        
+        let tableRows = "";
+        students.forEach((name, idx) => {
+            let studentData = (scoreRecapStore[currentSec] && scoreRecapStore[currentSec][idx]) ? scoreRecapStore[currentSec][idx] : { score: '', sig: '' };
+            let phoneVal = studentPhones[idx] || '-';
+            let sigImgHtml = studentData.sig ? `<img src="${studentData.sig}" width="120" height="40" />` : '- Belum TTD -';
+
+            tableRows += `
+                <tr>
+                    <td style="text-align:center;">${idx + 1}</td>
+                    <td>${name}</td>
+                    <td>${phoneVal}</td>
+                    <td style="text-align:center; font-weight:bold;">${studentData.score || '-'}</td>
+                    <td style="text-align:center;">${sigImgHtml}</td>
+                </tr>
+            `;
+        });
+
+        let content = `
+            <h2>BP3MI Aceh - Program Peningkatan Kapasitas Calon Pekerja Migran</h2>
+            <h3>REKAPITULASI NILAI UJIAN & TANDA TANGAN PESERTA</h3>
+            <p><strong>Kompetensi / Modul:</strong> ${currentSec}</p>
+            <p><strong>Tanggal Unduh:</strong> ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:35px;">No</th>
+                        <th>Nama Peserta Perawat</th>
+                        <th>No. HP / WhatsApp</th>
+                        <th style="width:100px;">Nilai Ujian</th>
+                        <th>Tanda Tangan Digital</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        `;
+
+        const filename = `Recap_Nilai_${currentSec.replace(/[^a-zA-Z0-9]/g, '_')}.doc`;
+        downloadWordDocument(filename, content);
     }
+
     function exportJournalToWord() {
-        alert("File dokumen Word jurnal KBM siap diunduh.");
+        syncCompletedDaysFromMaster();
+        const keys = Object.keys(completedDaysStore).sort((a,b) => parseInt(a.replace('day_','')) - parseInt(b.replace('day_','')));
+
+        let tableRows = "";
+        keys.forEach((k) => {
+            const item = completedDaysStore[k];
+            tableRows += `
+                <tr>
+                    <td style="text-align:center;">${item.day}</td>
+                    <td>${item.dateStr}</td>
+                    <td>${item.dayName}</td>
+                    <td>${item.sector}</td>
+                    <td>${item.subTopic}</td>
+                    <td style="text-align:center;">${item.jpl} JPL</td>
+                    <td style="text-align:center;">${item.cumulative} JPL</td>
+                </tr>
+            `;
+        });
+
+        let content = `
+            <h2>BP3MI Aceh - Program Peningkatan Kapasitas Calon Pekerja Migran</h2>
+            <h3>DOKUMEN RESMI JURNAL KBM & PROGRESS KAPASITAS</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:35px;">Hari</th>
+                        <th>Tanggal</th>
+                        <th>Hari</th>
+                        <th>Kompetensi / Modul</th>
+                        <th>Sub-Pokok Bahasan (in English)</th>
+                        <th>JPL</th>
+                        <th>Akumulasi JPL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        `;
+
+        downloadWordDocument("Jurnal_KBM_Lengkap_BP3MI.doc", content);
     }
+
     function exportFullScheduleToWord() {
-        alert("File dokumen Word jadwal 71 hari siap diunduh.");
+        let currentDate = new Date('2026-08-27');
+        let dayCounter = 1;
+        let sectorIdx = 0;
+        let jplInCurrentSector = 0;
+        let cumulativeJpl = 0;
+        let tableRows = "";
+
+        while(dayCounter <= 71 && sectorIdx < sectorsMaster.length) {
+            let dayOfWeek = currentDate.getDay();
+            let dateString = currentDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            let dayNameStr = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dayOfWeek];
+
+            if(dayOfWeek === 0) {
+                tableRows += `
+                    <tr style="background-color: #fef2f2;">
+                        <td style="text-align:center;">-</td>
+                        <td>${dateString}</td>
+                        <td>${dayNameStr}</td>
+                        <td colspan="4" style="text-align:center; color:#dc2626; font-weight:bold;">LIBUR HARI MINGGU</td>
+                    </tr>
+                `;
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+
+            let currentSec = sectorsMaster[sectorIdx];
+            let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
+            let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
+
+            if(jplToday <= 0) {
+                sectorIdx++;
+                if(sectorIdx >= sectorsMaster.length) break;
+                currentSec = sectorsMaster[sectorIdx];
+                jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
+                jplInCurrentSector = 0;
+            }
+
+            jplInCurrentSector += jplToday;
+            cumulativeJpl += jplToday;
+
+            let currentCustomSec = customSectorsStore[`day_${dayCounter}`] || currentSec.name;
+            let currentSubVal = subTopicsStore[`day_${dayCounter}`] || '-';
+
+            tableRows += `
+                <tr>
+                    <td style="text-align:center;">${dayCounter}</td>
+                    <td>${dateString}</td>
+                    <td>${dayNameStr}</td>
+                    <td>${currentCustomSec}</td>
+                    <td>${currentSubVal}</td>
+                    <td style="text-align:center;">${jplToday} JPL</td>
+                    <td style="text-align:center;">${cumulativeJpl} JPL</td>
+                </tr>
+            `;
+
+            if(jplInCurrentSector >= currentSec.totalJpl) {
+                sectorIdx++;
+                jplInCurrentSector = 0;
+            }
+
+            dayCounter++;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        let content = `
+            <h2>BP3MI Aceh - Program Peningkatan Kapasitas Calon Pekerja Migran</h2>
+            <h3>MASTER JADWAL KURIKULUM 640 JPL (HARI 1 - 71)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:35px;">Hari</th>
+                        <th>Tanggal</th>
+                        <th>Hari</th>
+                        <th>Kompetensi / Modul</th>
+                        <th>Sub-Pokok Bahasan (in English)</th>
+                        <th>JPL Harian</th>
+                        <th>Akumulasi JPL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        `;
+
+        downloadWordDocument("Master_Jadwal_Kurikulum_71Hari.doc", content);
     }
+
     function printFullSchedule() {
         window.print();
     }
