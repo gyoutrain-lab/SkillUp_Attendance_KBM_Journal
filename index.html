@@ -416,9 +416,9 @@
     <div class="locked-header">
         <h2>BP3MI Aceh & Program Peningkatan Kapasitas Calon Pekerja Migran</h2>
         <div class="header-grid">
-            <div><strong>Program:</strong> Master Kurikulum 640 JPL (Selesai 7 Nov 2026)</div>
+            <div><strong>Program:</strong> Master Kurikulum 640 JPL</div>
             <div><strong>Instruktur:</strong> <span id="displayInstructor">Giyono Asfarrasyid</span></div>
-            <div><strong>Sisa Target JPL:</strong> <span id="displayRemainingJpl" style="font-weight:bold; color:#fde047;">613 JPL</span></div>
+            <div><strong>Sisa Target JPL:</strong> <span id="displayRemainingJpl" style="font-weight:bold; color:#fde047;">640 JPL</span></div>
         </div>
     </div>
 
@@ -430,10 +430,11 @@
         <button class="nav-btn" id="btnMonthly" onclick="switchView('monthly')">📊 Monthly Report & Rekap</button>
     </div>
 
+    <!-- VIEW 1: LIVE -->
     <div id="viewLive" class="view-section active-view">
         <div class="alert-box">
-            <span>🔒 <strong>Status Hari Ini:</strong> Sesi presensi aktif harian. Sesi Hari Minggu teralokasi "English Drama Presentation" Full Day (08.00 - 15.30 WIB / 9 JPL) dihitung mundur persis selesai 7 November 2026.</span>
-            <button class="nav-btn" onclick="switchView('weekly')" style="padding: 4px 10px; font-size:0.78rem;">🔍 Lihat Tabel Master Hari 1-71+</button>
+            <span>🔒 <strong>Status Sistem:</strong> Minggu 01 Nov diset <strong>6 JPL</strong> (08.00–12.30 WIB). Minggu lainnya 5 JPL. Selesai terintegrasi presisi <strong>640 JPL</strong> pada <strong>7 Nov 2026</strong>.</span>
+            <button class="nav-btn" onclick="switchView('weekly')" style="padding: 4px 10px; font-size:0.78rem;">🔍 Lihat Tabel Master</button>
         </div>
 
         <div class="session-control-box">
@@ -447,7 +448,7 @@
             </div>
             <div class="control-group">
                 <label>Alokasi Waktu Harian:</label>
-                <input type="text" id="liveTimeAllocation" value="08.00 - 15.30 WIB (9 JPL Strict)" readonly style="background:#e2e8f0; font-weight:bold; color:#047857;">
+                <input type="text" value="08.00 - 16.30 WIB (10 JPL) / Minggu (5-6 JPL)" readonly style="background:#e2e8f0; font-weight:bold; color:#047857;">
             </div>
         </div>
 
@@ -484,6 +485,7 @@
         </div>
     </div>
 
+    <!-- VIEW NEW: RECAP NILAI & TANDA TANGAN UJIAN PER KOMPETENSI -->
     <div id="viewScoreRecap" class="view-section">
         <h3>🏆 Fasilitas "Recap Nilai" Ujian per Kompetensi & Tanda Tangan Peserta</h3>
         <p style="font-size: 0.88rem; color: #475569;">Fasilitas khusus rekap nilai ujian per kompetensi sesuai Master Kurikulum, lengkap dengan nomor HP, nilai ujian (0-100), serta tombol Save/Edit/Clear tanda tangan mandiri.</p>
@@ -520,13 +522,14 @@
         </div>
     </div>
 
+    <!-- VIEW 2: MASTER KURIKULUM TABLE -->
     <div id="viewWeekly" class="view-section">
-        <h3>📅 Master Tabel Kurikulum (Fixed Final Day: 7 November 2026 | Total 640 JPL)</h3>
+        <h3>📅 Master Tabel Kurikulum (27 Agu - 7 Nov 2026 | Presisi Tepat 640 JPL)</h3>
         
         <div class="filter-report-box">
             <div style="flex: 1; min-width: 280px;">
-                <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Status Master (Fixed Schedule Target):</label>
-                <input type="text" value="Mulai 27 Agu 2026 | Tanggal Akhir: 7 Nov 2026 | Hari Minggu: English Drama Presentation (9 JPL Full Day)" readonly style="width: 100%; padding: 7px; border: 1px solid #10b981; border-radius: 4px; font-size: 0.88rem; background:#f0fdf4; font-weight:bold;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Status Master Target Tepat 640 JPL (7 Nov 2026):</label>
+                <input type="text" id="targetInfoBox" readonly style="width: 100%; padding: 7px; border: 1px solid #10b981; border-radius: 4px; font-size: 0.88rem; background:#f0fdf4; font-weight:bold;">
             </div>
             <div style="display: flex; gap: 8px;">
                 <button class="nav-btn" style="background:#059669; color:white;" onclick="saveAllMasterData()">💾 Save All Master Data (Modul & Sub)</button>
@@ -534,7 +537,7 @@
         </div>
 
         <div class="schedule-timeline-box" style="margin-bottom: 25px;">
-            <h4>📋 Jadwal Harian Lengkap (Hari 1 s.d. Selesai 7 November 2026)</h4>
+            <h4>📋 Jadwal Harian Lengkap & Kolom Sub-Pokok Bahasan</h4>
             <div style="max-height: 480px; overflow-y: auto;" id="masterTableContainer">
                 <table class="presence-table" style="font-size: 0.8rem; margin-top: 5px;">
                     <thead style="position: sticky; top: 0; background: #f1f5f9; z-index: 2;">
@@ -563,6 +566,7 @@
         </div>
     </div>
 
+    <!-- VIEW 3: JOURNAL KBM & PROGRESS -->
     <div id="viewJournal" class="view-section">
         <h3>📖 Jurnal KBM & Progress</h3>
         <p style="font-size: 0.88rem; color: #475569;">Dokumen resmi jurnal capaian belajar. Sesi terkunci permanen; operator dapat mengedit ulang untuk penyesuaian JPL secara dinamis.</p>
@@ -594,8 +598,9 @@
         </div>
     </div>
 
+    <!-- VIEW 4: MONTHLY REPORT -->
     <div id="viewMonthly" class="view-section">
-        <h3>📊 Monthly Report & Rekapitulasi (640 JPL Target)</h3>
+        <h3>📊 Monthly Report & Rekapitulasi (640 JPL)</h3>
         <div class="filter-report-box">
             <div style="flex: 1;">
                 <label style="font-size: 0.8rem; font-weight: bold; color: #065f46; display: block; margin-bottom: 4px;">Pilih Kompetensi / Sektor:</label>
@@ -656,105 +661,125 @@
         { id: "final_sim", name: "9. Integrated Simulation & Final Assessment", totalJpl: 28, cluster: "Integrasi & Portofolio" }
     ];
 
-    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_cloud_v6') || '{}');
-    let studentPhones = JSON.parse(localStorage.getItem('bp3mi_student_phones_v6') || '{}');
-    let individualSignatures = JSON.parse(localStorage.getItem('bp3mi_indiv_sigs_v6') || '{}');
-    let subTopicsStore = JSON.parse(localStorage.getItem('bp3mi_subtopics_v6') || '{}');
-    let customSectorsStore = JSON.parse(localStorage.getItem('bp3mi_custom_sectors_v6') || '{}');
-    let completedDaysStore = JSON.parse(localStorage.getItem('bp3mi_completed_days_v6') || '{}');
-    let journalLockedStates = JSON.parse(localStorage.getItem('bp3mi_journal_locks_v6') || '{}');
-    let scoreRecapStore = JSON.parse(localStorage.getItem('bp3mi_score_recap_v6') || '{}');
-    let activeCurrentSector = localStorage.getItem('bp3mi_active_sector_v6') || "1.1 English Basic Pattern";
+    let recordedSessions = JSON.parse(localStorage.getItem('bp3mi_attendance_cloud_v12') || '{}');
+    let studentPhones = JSON.parse(localStorage.getItem('bp3mi_student_phones_v12') || '{}');
+    let individualSignatures = JSON.parse(localStorage.getItem('bp3mi_indiv_sigs_v12') || '{}');
+    let subTopicsStore = JSON.parse(localStorage.getItem('bp3mi_subtopics_v12') || '{}');
+    let customSectorsStore = JSON.parse(localStorage.getItem('bp3mi_custom_sectors_v12') || '{}');
+    let completedDaysStore = JSON.parse(localStorage.getItem('bp3mi_completed_days_v12') || '{}');
+    let journalLockedStates = JSON.parse(localStorage.getItem('bp3mi_journal_locks_v12') || '{}');
+    let scoreRecapStore = JSON.parse(localStorage.getItem('bp3mi_score_recap_v12') || '{}');
+    let activeCurrentSector = localStorage.getItem('bp3mi_active_sector_v12') || "1.1 English Basic Pattern";
     let isOperatorUnlocked = false;
 
-    // Build schedule map dynamically targeting 7 Nov 2026 completion with Sunday = 9 JPL
-    let scheduleMap = [];
+    let computedSchedule = [];
 
-    function generateRebuiltSchedule() {
-        scheduleMap = [];
-        let startDate = new Date('2026-08-27');
-        let endDate = new Date('2026-11-07');
-        
-        let currentDate = new Date(startDate);
+    function generateCustomSchedule() {
+        const START_DATE = new Date('2026-08-27');
+        const TARGET_END_DATE = new Date('2026-11-07');
+        const SWITCH_DATE = new Date('2026-09-21');
+
+        START_DATE.setHours(0,0,0,0);
+        TARGET_END_DATE.setHours(0,0,0,0);
+        SWITCH_DATE.setHours(0,0,0,0);
+
+        let currDate = new Date(START_DATE);
+        let scheduleRaw = [];
+        let cumulativeForward = 0;
+
         let sectorIdx = 0;
         let jplInCurrentSector = 0;
-        let cumulativeJpl = 0;
         let dayCounter = 1;
 
-        while (currentDate <= endDate && cumulativeJpl < 640 && sectorIdx < sectorsMaster.length) {
-            let dayOfWeek = currentDate.getDay();
-            let dateString = currentDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-            let dayNameStr = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dayOfWeek];
+        while (currDate <= TARGET_END_DATE) {
+            let dayOfWeek = currDate.getDay();
+            let isSunday = (dayOfWeek === 0);
+            let jplToday = 0;
 
-            if (dayOfWeek === 0) { // Sunday Session (9 JPL Full Day)
-                let sundayJpl = 9;
-                if (cumulativeJpl + sundayJpl > 640) sundayJpl = 640 - cumulativeJpl;
-                cumulativeJpl += sundayJpl;
-                
-                scheduleMap.push({
-                    dayNum: dayCounter,
-                    dateObj: new Date(currentDate),
-                    dateStr: dateString,
-                    dayName: dayNameStr,
-                    isSunday: true,
-                    sector: "English Drama Presentation",
-                    subTopic: "English Drama Presentation (08.00 - 15.30 WIB)",
-                    jpl: sundayJpl,
-                    cumulative: cumulativeJpl
-                });
+            if (currDate < SWITCH_DATE) {
+                jplToday = isSunday ? 0 : 9;
             } else {
-                let currentSec = sectorsMaster[sectorIdx];
-                let remainingInSec = currentSec.totalJpl - jplInCurrentSector;
-                let jplToday = (remainingInSec < 9 && remainingInSec > 0) ? remainingInSec : 9;
-
-                if (jplToday <= 0) {
-                    sectorIdx++;
-                    if (sectorIdx >= sectorsMaster.length) break;
-                    currentSec = sectorsMaster[sectorIdx];
-                    jplToday = currentSec.totalJpl >= 9 ? 9 : currentSec.totalJpl;
-                    jplInCurrentSector = 0;
-                }
-
-                if (cumulativeJpl + jplToday > 640) jplToday = 640 - cumulativeJpl;
-
-                jplInCurrentSector += jplToday;
-                cumulativeJpl += jplToday;
-
-                scheduleMap.push({
-                    dayNum: dayCounter,
-                    dateObj: new Date(currentDate),
-                    dateStr: dateString,
-                    dayName: dayNameStr,
-                    isSunday: false,
-                    sector: customSectorsStore[`day_${dayCounter}`] || currentSec.name,
-                    subTopic: subTopicsStore[`day_${dayCounter}`] || "Regular Competency Session",
-                    jpl: jplToday,
-                    cumulative: cumulativeJpl
-                });
-
-                if (jplInCurrentSector >= currentSec.totalJpl) {
-                    sectorIdx++;
-                    jplInCurrentSector = 0;
+                if (isSunday) {
+                    // Pengecekan Presisi Tanggal Lokal: 1 November (Month Index 10 = November)
+                    let isNovFirst = (currDate.getDate() === 1 && currDate.getMonth() === 10);
+                    jplToday = isNovFirst ? 6 : 5;
+                } else {
+                    jplToday = 10;
                 }
             }
 
-            dayCounter++;
-            currentDate.setDate(currentDate.getDate() + 1);
+            if (jplToday > 0) {
+                cumulativeForward += jplToday;
+                let sectorName = "";
+                let subTopicDefault = "";
+
+                if (isSunday) {
+                    sectorName = "English Drama Presentation";
+                    let endTime = (jplToday === 6) ? "12.30" : "11.45";
+                    subTopicDefault = `English Drama Presentation & Roleplay (08.00 - ${endTime} WIB / ${jplToday} JPL)`;
+                } else {
+                    let currentSec = sectorsMaster[sectorIdx];
+                    while (sectorIdx < sectorsMaster.length && jplInCurrentSector >= currentSec.totalJpl) {
+                        sectorIdx++;
+                        if (sectorIdx < sectorsMaster.length) {
+                            currentSec = sectorsMaster[sectorIdx];
+                            jplInCurrentSector = 0;
+                        }
+                    }
+
+                    if (sectorIdx < sectorsMaster.length) {
+                        sectorName = currentSec.name;
+                        jplInCurrentSector += jplToday;
+                    } else {
+                        sectorName = "9. Integrated Simulation & Final Assessment";
+                    }
+                }
+
+                let dateString = currDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                let dayNameStr = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dayOfWeek];
+
+                scheduleRaw.push({
+                    dayNum: dayCounter,
+                    dateObj: new Date(currDate),
+                    dateStr: dateString,
+                    dayName: dayNameStr,
+                    isSunday: isSunday,
+                    sector: customSectorsStore[`day_${dayCounter}`] || sectorName,
+                    subTopic: subTopicsStore[`day_${dayCounter}`] || subTopicDefault,
+                    jpl: jplToday,
+                    cumulative: cumulativeForward
+                });
+
+                dayCounter++;
+            }
+
+            currDate.setDate(currDate.getDate() + 1);
+        }
+
+        computedSchedule = scheduleRaw;
+
+        if (computedSchedule.length > 0) {
+            const targetBox = document.getElementById('targetInfoBox');
+            if (targetBox) {
+                targetBox.value = `27 Agu - 7 Nov 2026 | Selesai Tepat 7 Nov | Total Presisi 640 JPL`;
+            }
         }
     }
 
     function initDefaultData() {
-        if(!subTopicsStore['day_1']) subTopicsStore['day_1'] = "Basic Sentences & Professional Greetings";
-        if(!subTopicsStore['day_2']) subTopicsStore['day_2'] = "Pronouns, Nouns & Clinical Naming";
-        if(!subTopicsStore['day_3']) subTopicsStore['day_3'] = "Job interview";
+        generateCustomSchedule();
+        computedSchedule.forEach(item => {
+            let k = `day_${item.dayNum}`;
+            if (!subTopicsStore[k] && item.subTopic) {
+                subTopicsStore[k] = item.subTopic;
+            }
+            if (journalLockedStates[k] === undefined) {
+                journalLockedStates[k] = true;
+            }
+        });
 
-        if(journalLockedStates['day_1'] === undefined) journalLockedStates['day_1'] = true;
-        if(journalLockedStates['day_2'] === undefined) journalLockedStates['day_2'] = true;
-        if(journalLockedStates['day_3'] === undefined) journalLockedStates['day_3'] = true;
-
-        localStorage.setItem('bp3mi_subtopics_v6', JSON.stringify(subTopicsStore));
-        localStorage.setItem('bp3mi_journal_locks_v6', JSON.stringify(journalLockedStates));
-        generateRebuiltSchedule();
+        localStorage.setItem('bp3mi_subtopics_v12', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v12', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
     }
 
@@ -773,7 +798,7 @@
         const liveSectorSelect = document.getElementById('liveSector');
         if(!liveSectorSelect) return;
         activeCurrentSector = liveSectorSelect.value;
-        localStorage.setItem('bp3mi_active_sector_v6', activeCurrentSector);
+        localStorage.setItem('bp3mi_active_sector_v12', activeCurrentSector);
         updateInstructorDisplay(activeCurrentSector);
     }
 
@@ -781,10 +806,10 @@
         completedDaysStore = {};
         let systemCurrentDate = new Date();
 
-        scheduleMap.forEach(item => {
-            if(item.dateObj <= systemCurrentDate) {
-                let subVal = subTopicsStore[`day_${item.dayNum}`] || item.subTopic;
-                let sectorVal = item.isSunday ? "English Drama Presentation" : (customSectorsStore[`day_${item.dayNum}`] || item.sector);
+        computedSchedule.forEach(item => {
+            if (item.dateObj <= systemCurrentDate) {
+                let subVal = subTopicsStore[`day_${item.dayNum}`] || item.subTopic || '-';
+                let sectorVal = customSectorsStore[`day_${item.dayNum}`] || item.sector;
                 completedDaysStore[`day_${item.dayNum}`] = {
                     day: item.dayNum,
                     dateStr: item.dateStr,
@@ -792,12 +817,11 @@
                     sector: sectorVal,
                     subTopic: subVal,
                     jpl: item.jpl,
-                    cumulative: item.cumulative,
-                    isSunday: item.isSunday
+                    cumulative: item.cumulative
                 };
             }
         });
-        localStorage.setItem('bp3mi_completed_days_v6', JSON.stringify(completedDaysStore));
+        localStorage.setItem('bp3mi_completed_days_v12', JSON.stringify(completedDaysStore));
     }
 
     initDefaultData();
@@ -816,7 +840,6 @@
 
     function startLiveSystemClock() {
         const liveDateInput = document.getElementById('liveDate');
-        const liveTimeAlloc = document.getElementById('liveTimeAllocation');
         if (!liveDateInput) return;
 
         function updateClock() {
@@ -825,14 +848,6 @@
             const dateStr = now.toLocaleDateString('id-ID', options);
             const timeStr = now.toLocaleTimeString('id-ID');
             liveDateInput.value = `${dateStr} - ${timeStr} WIB`;
-
-            if(liveTimeAlloc) {
-                if(now.getDay() === 0) {
-                    liveTimeAlloc.value = "08.00 - 15.30 WIB (9 JPL Sunday Drama)";
-                } else {
-                    liveTimeAlloc.value = "08.00 - 15.30 WIB (9 JPL Strict)";
-                }
-            }
         }
 
         updateClock();
@@ -846,7 +861,7 @@
         sectorsMaster.forEach(sec => {
             select.innerHTML += `<option value="${sec.name}">${sec.name} (${sec.totalJpl} JPL)</option>`;
         });
-        select.innerHTML += `<option value="English Drama Presentation">English Drama Presentation (9 JPL / Sunday)</option>`;
+        select.innerHTML += `<option value="English Drama Presentation">English Drama Presentation (Minggu)</option>`;
     }
 
     function populateScoreRecapDropdown() {
@@ -856,15 +871,15 @@
         sectorsMaster.forEach(sec => {
             select.innerHTML += `<option value="${sec.name}">${sec.name} (${sec.cluster})</option>`;
         });
-        select.innerHTML += `<option value="English Drama Presentation">English Drama Presentation (Drama Assessment)</option>`;
+        select.innerHTML += `<option value="English Drama Presentation">English Drama Presentation (Bahasa Inggris)</option>`;
     }
 
     function calculateRemainingJpl() {
         let totalCompletedJpl = 0;
         let systemCurrentDate = new Date();
 
-        scheduleMap.forEach(item => {
-            if(item.dateObj <= systemCurrentDate) {
+        computedSchedule.forEach(item => {
+            if (item.dateObj <= systemCurrentDate) {
                 let isLocked = journalLockedStates[`day_${item.dayNum}`] !== undefined ? journalLockedStates[`day_${item.dayNum}`] : true;
                 if (isLocked) totalCompletedJpl += item.jpl;
             }
@@ -877,7 +892,7 @@
     }
 
     function generateMasterKurikulumTable() {
-        generateRebuiltSchedule();
+        generateCustomSchedule();
         const tbody = document.getElementById('masterKurikulumTableBody');
         if(!tbody) return;
         tbody.innerHTML = "";
@@ -885,7 +900,7 @@
         let systemCurrentDate = new Date();
         systemCurrentDate.setHours(0,0,0,0);
 
-        scheduleMap.forEach(item => {
+        computedSchedule.forEach(item => {
             let cellDateNormalized = new Date(item.dateObj);
             cellDateNormalized.setHours(0,0,0,0);
 
@@ -894,56 +909,43 @@
                 ? `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:3px; font-size:0.7rem; font-weight:bold;">CLOSED (<strong>${item.cumulative} JPL</strong>)</span>` 
                 : `<span style="background:#d1fae5; color:#065f46; padding:2px 6px; border-radius:3px; font-size:0.7rem; font-weight:bold;">LIVE (<strong>${item.cumulative} JPL</strong>)</span>`;
 
-            if(item.isSunday) {
-                tbody.innerHTML += `
-                    <tr style="background-color: #fefce8; color: #854d0e; font-weight: bold;">
-                        <td style="text-align:center;">${item.dayNum}</td>
-                        <td>${item.dateStr}</td>
-                        <td>${item.dayName}</td>
-                        <td style="color:#b45309;">🎭 English Drama Presentation</td>
-                        <td><input type="text" readonly value="English Drama Presentation (08.00 - 15.30 WIB)" style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #fef08a; background:#fef9c3; font-weight:bold; color:#854d0e;"></td>
-                        <td style="text-align:center;"><span style="font-size:0.72rem; color:#854d0e;">Fixed</span></td>
-                        <td style="text-align:center; color:#b45309; font-weight:bold;">${item.jpl} JPL</td>
-                        <td style="text-align:center;">${statusBadge}</td>
-                    </tr>
-                `;
-            } else {
-                let defaultSecName = item.sector;
-                let currentCustomSec = customSectorsStore[`day_${item.dayNum}`] || defaultSecName;
-                let subTopicKey = `day_${item.dayNum}`;
-                let currentSubVal = subTopicsStore[subTopicKey] || '';
+            let currentCustomSec = customSectorsStore[`day_${item.dayNum}`] || item.sector;
+            let currentSubVal = subTopicsStore[`day_${item.dayNum}`] || item.subTopic || '';
 
-                let sectorOptionsHtml = "";
-                sectorsMaster.forEach(s => {
-                    let sel = (s.name === currentCustomSec) ? 'selected' : '';
-                    sectorOptionsHtml += `<option value="${s.name}" ${sel}>${s.name}</option>`;
-                });
+            let sectorOptionsHtml = "";
+            sectorsMaster.forEach(s => {
+                let sel = (s.name === currentCustomSec) ? 'selected' : '';
+                sectorOptionsHtml += `<option value="${s.name}" ${sel}>${s.name}</option>`;
+            });
 
-                let isModifiedModule = (currentCustomSec !== defaultSecName);
-                let jplDisplayStyle = isModifiedModule ? 'color: #dc2626; font-weight: bold; background: #fee2e2;' : 'color: #047857; font-weight: bold;';
-                let isDisabledField = !isOperatorUnlocked;
+            let selDrama = (currentCustomSec === "English Drama Presentation") ? 'selected' : '';
+            sectorOptionsHtml += `<option value="English Drama Presentation" ${selDrama}>English Drama Presentation</option>`;
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="text-align:center; font-weight:bold;">${item.dayNum}</td>
-                        <td>${item.dateStr}</td>
-                        <td><strong>${item.dayName}</strong></td>
-                        <td>
-                            <select id="master_sector_${item.dayNum}" ${isDisabledField ? 'disabled' : ''} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isDisabledField ? '#f8fafc' : '#fff'};" onchange="liveSyncSector(${item.dayNum}, this.value)">
-                                ${sectorOptionsHtml}
-                            </select>
-                        </td>
-                        <td>
-                            <input type="text" id="sub_input_${item.dayNum}" value="${currentSubVal}" placeholder="Enter sub-topic..." ${isDisabledField ? 'disabled' : ''} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isDisabledField ? '#f8fafc' : '#fff'};" oninput="liveSyncSubTopic(${item.dayNum}, this.value)">
-                        </td>
-                        <td style="text-align:center;">
-                            <button type="button" class="btn-save-sub" onclick="saveSingleMasterRow(${item.dayNum})" ${isDisabledField ? 'disabled' : ''}>Save</button>
-                        </td>
-                        <td style="text-align:center; ${jplDisplayStyle}">${item.jpl} JPL</td>
-                        <td style="text-align:center;">${statusBadge}</td>
-                    </tr>
-                `;
-            }
+            let isDisabledField = !isOperatorUnlocked;
+            let rowStyle = item.isSunday ? 'background-color: #f0fdf4;' : '';
+
+            tbody.innerHTML += `
+                <tr style="${rowStyle}">
+                    <td style="text-align:center; font-weight:bold;">${item.dayNum}</td>
+                    <td>${item.dateStr}</td>
+                    <td><strong>${item.dayName}</strong></td>
+                    <td>
+                        <select id="master_sector_${item.dayNum}" ${isDisabledField ? 'disabled' : ''} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isDisabledField ? '#f8fafc' : '#fff'};" onchange="liveSyncSector(${item.dayNum}, this.value)">
+                            ${sectorOptionsHtml}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" id="sub_input_${item.dayNum}" value="${currentSubVal}" placeholder="Enter sub-topic..." ${isDisabledField ? 'disabled' : ''} style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:${isDisabledField ? '#f8fafc' : '#fff'};" oninput="liveSyncSubTopic(${item.dayNum}, this.value)">
+                    </td>
+                    <td style="text-align:center;">
+                        <button type="button" class="btn-save-sub" onclick="saveSingleMasterRow(${item.dayNum})" ${isDisabledField ? 'disabled' : ''}>Save</button>
+                    </td>
+                    <td style="text-align:center; color:${item.isSunday ? '#0d9488' : '#047857'}; font-weight:bold;" id="jpl_cell_${item.dayNum}">${item.jpl} JPL</td>
+                    <td style="text-align:center;">
+                        ${statusBadge}
+                    </td>
+                </tr>
+            `;
         });
 
         calculateRemainingJpl();
@@ -951,13 +953,13 @@
 
     function liveSyncSector(dayNum, val) {
         customSectorsStore[`day_${dayNum}`] = val;
-        localStorage.setItem('bp3mi_custom_sectors_v6', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_custom_sectors_v12', JSON.stringify(customSectorsStore));
         syncCompletedDaysFromMaster();
     }
 
     function liveSyncSubTopic(dayNum, val) {
         subTopicsStore[`day_${dayNum}`] = val;
-        localStorage.setItem('bp3mi_subtopics_v6', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_subtopics_v12', JSON.stringify(subTopicsStore));
         syncCompletedDaysFromMaster();
     }
 
@@ -978,9 +980,9 @@
         subTopicsStore[`day_${dayNum}`] = subVal;
         journalLockedStates[`day_${dayNum}`] = true;
 
-        localStorage.setItem('bp3mi_custom_sectors_v6', JSON.stringify(customSectorsStore));
-        localStorage.setItem('bp3mi_subtopics_v6', JSON.stringify(subTopicsStore));
-        localStorage.setItem('bp3mi_journal_locks_v6', JSON.stringify(journalLockedStates));
+        localStorage.setItem('bp3mi_custom_sectors_v12', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_subtopics_v12', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v12', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
 
         alert(`Hari ke-${dayNum} berhasil disimpan dan dikunci permanen.`);
@@ -994,22 +996,20 @@
             return;
         }
 
-        scheduleMap.forEach(item => {
-            if(!item.isSunday) {
-                const sectorElem = document.getElementById(`master_sector_${item.dayNum}`);
-                const inputElem = document.getElementById(`sub_input_${item.dayNum}`);
+        computedSchedule.forEach(item => {
+            const sectorElem = document.getElementById(`master_sector_${item.dayNum}`);
+            const inputElem = document.getElementById(`sub_input_${item.dayNum}`);
 
-                if(sectorElem && inputElem && !sectorElem.disabled) {
-                    customSectorsStore[`day_${item.dayNum}`] = sectorElem.value;
-                    if(inputElem.value.trim() !== '') subTopicsStore[`day_${item.dayNum}`] = inputElem.value.trim();
-                    journalLockedStates[`day_${item.dayNum}`] = true;
-                }
+            if(sectorElem && inputElem && !sectorElem.disabled) {
+                customSectorsStore[`day_${item.dayNum}`] = sectorElem.value;
+                if(inputElem.value.trim() !== '') subTopicsStore[`day_${item.dayNum}`] = inputElem.value.trim();
+                journalLockedStates[`day_${item.dayNum}`] = true;
             }
         });
 
-        localStorage.setItem('bp3mi_custom_sectors_v6', JSON.stringify(customSectorsStore));
-        localStorage.setItem('bp3mi_subtopics_v6', JSON.stringify(subTopicsStore));
-        localStorage.setItem('bp3mi_journal_locks_v6', JSON.stringify(journalLockedStates));
+        localStorage.setItem('bp3mi_custom_sectors_v12', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_subtopics_v12', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_journal_locks_v12', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
 
         alert("Semua data master berhasil disimpan dan dikunci permanen!");
@@ -1034,23 +1034,20 @@
             const item = completedDaysStore[k];
             let dayNum = item.day;
             let isLocked = journalLockedStates[k] !== undefined ? journalLockedStates[k] : true;
-            let jplDisplayStyle = item.isSunday ? 'color: #b45309; font-weight: bold;' : 'color: #dc2626; font-weight: bold;';
 
-            if (isLocked || item.isSunday) {
+            if (isLocked) {
                 tbody.innerHTML += `
-                    <tr style="${item.isSunday ? 'background-color:#fefce8;' : ''}">
+                    <tr>
                         <td style="text-align:center; font-weight:bold;">${item.day}</td>
                         <td>${item.dateStr}</td>
                         <td><strong>${item.dayName}</strong></td>
                         <td>${item.sector}</td>
                         <td>${item.subTopic}</td>
-                        <td style="text-align:center; ${jplDisplayStyle}">${item.jpl} JPL</td>
+                        <td style="text-align:center; color:#dc2626; font-weight:bold;">${item.jpl} JPL</td>
                         <td style="text-align:center;"><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold;">CLOSED (${item.cumulative} JPL)</span></td>
                         <td style="text-align:center;">
-                            ${item.isSunday ? '<span style="font-size:0.75rem; color:#854d0e;">Sunday Drama</span>' : `
-                                <button type="button" class="btn-edit-journal" onclick="enableJournalEdit(${dayNum})" ${isOperatorUnlocked ? '' : 'disabled'}>Edit</button>
-                                <button type="button" class="btn-save-journal" disabled style="opacity:0.4; cursor:not-allowed;">Save</button>
-                            `}
+                            <button type="button" class="btn-edit-journal" onclick="enableJournalEdit(${dayNum})" ${isOperatorUnlocked ? '' : 'disabled'}>Edit</button>
+                            <button type="button" class="btn-save-journal" disabled style="opacity:0.4; cursor:not-allowed;">Save</button>
                         </td>
                     </tr>
                 `;
@@ -1060,6 +1057,8 @@
                     let sel = (s.name === item.sector) ? 'selected' : '';
                     sectorOptionsHtml += `<option value="${s.name}" ${sel}>${s.name}</option>`;
                 });
+                let selDrama = (item.sector === "English Drama Presentation") ? 'selected' : '';
+                sectorOptionsHtml += `<option value="English Drama Presentation" ${selDrama}>English Drama Presentation</option>`;
 
                 tbody.innerHTML += `
                     <tr>
@@ -1068,7 +1067,7 @@
                         <td><strong>${item.dayName}</strong></td>
                         <td><select id="journal_sector_${dayNum}" style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:#fff;">${sectorOptionsHtml}</select></td>
                         <td><input type="text" id="journal_sub_${dayNum}" value="${item.subTopic}" style="width:100%; padding:4px; font-size:0.78rem; border:1px solid #cbd5e1; border-radius:3px; background:#fff;"></td>
-                        <td style="text-align:center; ${jplDisplayStyle}">${item.jpl} JPL</td>
+                        <td style="text-align:center; color:#dc2626; font-weight:bold;">${item.jpl} JPL</td>
                         <td style="text-align:center;"><span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:bold;">EDITING</span></td>
                         <td style="text-align:center;">
                             <button type="button" class="btn-edit-journal" disabled style="opacity:0.4; cursor:not-allowed;">Edit</button>
@@ -1087,7 +1086,7 @@
             return;
         }
         journalLockedStates[`day_${dayNum}`] = false;
-        localStorage.setItem('bp3mi_journal_locks_v6', JSON.stringify(journalLockedStates));
+        localStorage.setItem('bp3mi_journal_locks_v12', JSON.stringify(journalLockedStates));
         renderJournalTable();
         generateMasterKurikulumTable();
     }
@@ -1112,9 +1111,9 @@
         customSectorsStore[key] = secVal;
         journalLockedStates[key] = true;
 
-        localStorage.setItem('bp3mi_subtopics_v6', JSON.stringify(subTopicsStore));
-        localStorage.setItem('bp3mi_custom_sectors_v6', JSON.stringify(customSectorsStore));
-        localStorage.setItem('bp3mi_journal_locks_v6', JSON.stringify(journalLockedStates));
+        localStorage.setItem('bp3mi_subtopics_v12', JSON.stringify(subTopicsStore));
+        localStorage.setItem('bp3mi_custom_sectors_v12', JSON.stringify(customSectorsStore));
+        localStorage.setItem('bp3mi_journal_locks_v12', JSON.stringify(journalLockedStates));
         syncCompletedDaysFromMaster();
 
         alert(`Koreksi Jurnal KBM Hari ke-${dayNum} berhasil disimpan!`);
@@ -1132,7 +1131,8 @@
             if(sec.name === activeCurrentSector) opt.selected = true;
             select.appendChild(opt);
         });
-        select.innerHTML += `<option value="English Drama Presentation">English Drama Presentation (9 JPL / Sunday)</option>`;
+        select.innerHTML += `<option value="English Drama Presentation">English Drama Presentation (Minggu)</option>`;
+        
         updateInstructorDisplay(activeCurrentSector);
 
         const tbody = document.getElementById('liveRosterBody');
@@ -1167,7 +1167,7 @@
 
     function saveStudentPhone(idx, phoneVal) {
         studentPhones[idx] = phoneVal.trim();
-        localStorage.setItem('bp3mi_student_phones_v6', JSON.stringify(studentPhones));
+        localStorage.setItem('bp3mi_student_phones_v12', JSON.stringify(studentPhones));
         updateOperatorReviewStatus();
     }
 
@@ -1211,7 +1211,7 @@
         if(!canvas) return;
         const dataUrl = canvas.toDataURL();
         individualSignatures[idx] = dataUrl;
-        localStorage.setItem('bp3mi_indiv_sigs_v6', JSON.stringify(individualSignatures));
+        localStorage.setItem('bp3mi_indiv_sigs_v12', JSON.stringify(individualSignatures));
         updateOperatorReviewStatus();
         alert(`Tanda tangan peserta nomor ${idx + 1} (${students[idx]}) berhasil di-save dan diamankan permanen!`);
     }
@@ -1226,7 +1226,7 @@
         if(!canvas) return;
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         delete individualSignatures[idx];
-        localStorage.setItem('bp3mi_indiv_sigs_v6', JSON.stringify(individualSignatures));
+        localStorage.setItem('bp3mi_indiv_sigs_v12', JSON.stringify(individualSignatures));
         updateOperatorReviewStatus();
         alert(`Tanda tangan peserta nomor ${idx + 1} dikosongkan.`);
     }
@@ -1318,7 +1318,7 @@
         if(!scoreRecapStore[sectorName]) scoreRecapStore[sectorName] = {};
         if(!scoreRecapStore[sectorName][idx]) scoreRecapStore[sectorName][idx] = { score: '', sig: '' };
         scoreRecapStore[sectorName][idx].sig = canvas.toDataURL();
-        localStorage.setItem('bp3mi_score_recap_v6', JSON.stringify(scoreRecapStore));
+        localStorage.setItem('bp3mi_score_recap_v12', JSON.stringify(scoreRecapStore));
         alert(`Tanda tangan ujian untuk peserta nomor ${idx + 1} berhasil disimpan!`);
     }
 
@@ -1332,7 +1332,7 @@
             canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
             if(scoreRecapStore[sectorName] && scoreRecapStore[sectorName][idx]) {
                 scoreRecapStore[sectorName][idx].sig = "";
-                localStorage.setItem('bp3mi_score_recap_v6', JSON.stringify(scoreRecapStore));
+                localStorage.setItem('bp3mi_score_recap_v12', JSON.stringify(scoreRecapStore));
             }
         }
     }
@@ -1351,7 +1351,7 @@
             }
         });
 
-        localStorage.setItem('bp3mi_score_recap_v6', JSON.stringify(scoreRecapStore));
+        localStorage.setItem('bp3mi_score_recap_v12', JSON.stringify(scoreRecapStore));
         alert(`Rekap nilai ujian untuk kompetensi "${currentSec}" berhasil disimpan!`);
     }
 
@@ -1414,17 +1414,15 @@
             };
         });
 
-        const isSundayNow = new Date().getDay() === 0;
-
         const sessionData = {
             date: currentDate,
             sectorInfo: sectorVal,
-            timeSlot: isSundayNow ? "08.00 - 15.30 WIB (9 JPL Sunday Drama)" : "08.00 - 15.30 WIB (9 JPL Strict)",
+            timeSlot: "08.00 - 16.30 WIB (10 JPL) / Minggu (5-6 JPL)",
             students: studentLogs
         };
 
         recordedSessions[key] = sessionData;
-        localStorage.setItem('bp3mi_attendance_cloud_v6', JSON.stringify(recordedSessions));
+        localStorage.setItem('bp3mi_attendance_cloud_v12', JSON.stringify(recordedSessions));
         alert("Sesi presensi dan tanda tangan berhasil di-save secara menyeluruh ke arsip sistem!");
         renderMonthlyReport();
     }
@@ -1471,6 +1469,7 @@
         const filterSelect = document.getElementById('filterMonthlySector');
         
         if(!tbody || !jnlContainer || !filterSelect) return;
+        const selectedFilter = filterSelect.value;
         
         tbody.innerHTML = "";
         jnlContainer.innerHTML = "<h4>📖 Ringkasan Jurnal Sesi Terekam</h4>";
@@ -1612,17 +1611,20 @@
     }
 
     function exportFullScheduleToWord() {
-        generateRebuiltSchedule();
+        generateCustomSchedule();
         let tableRows = "";
 
-        scheduleMap.forEach(item => {
+        computedSchedule.forEach(item => {
+            let currentCustomSec = customSectorsStore[`day_${item.dayNum}`] || item.sector;
+            let currentSubVal = subTopicsStore[`day_${item.dayNum}`] || item.subTopic || '-';
+
             tableRows += `
-                <tr style="${item.isSunday ? 'background-color:#fefce8;' : ''}">
+                <tr>
                     <td style="text-align:center;">${item.dayNum}</td>
                     <td>${item.dateStr}</td>
                     <td>${item.dayName}</td>
-                    <td>${item.sector}</td>
-                    <td>${subTopicsStore[`day_${item.dayNum}`] || item.subTopic}</td>
+                    <td>${currentCustomSec}</td>
+                    <td>${currentSubVal}</td>
                     <td style="text-align:center;">${item.jpl} JPL</td>
                     <td style="text-align:center;">${item.cumulative} JPL</td>
                 </tr>
@@ -1631,7 +1633,7 @@
 
         let content = `
             <h2>BP3MI Aceh - Program Peningkatan Kapasitas Calon Pekerja Migran</h2>
-            <h3>MASTER JADWAL KURIKULUM 640 JPL (FIXED FINAL DAY: 7 NOVEMBER 2026)</h3>
+            <h3>MASTER JADWAL KURIKULUM 640 JPL (27 AGUSTUS - 7 NOVEMBER 2026)</h3>
             <table>
                 <thead>
                     <tr>
@@ -1650,7 +1652,7 @@
             </table>
         `;
 
-        downloadWordDocument("Master_Jadwal_Kurikulum_Target_7Nov.doc", content);
+        downloadWordDocument("Master_Jadwal_Kurikulum_640JPL.doc", content);
     }
 
     function printFullSchedule() {
